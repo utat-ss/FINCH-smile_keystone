@@ -6,6 +6,8 @@ authors = ["UTAT"]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
+numpy = "^1.23.4"
+matplotlib = "^3.6.1"
 
 [tool.poetry.dev-dependencies]
 ipykernel = "^6.13.0"
@@ -32,7 +34,7 @@ import_heading_thirdparty="external"
 import_heading_firstparty="project"
 
 [tool.black]
-line-length = 88
+line-length = 100
 
 [tool.autoflake]
 remove-all-unused-imports = true

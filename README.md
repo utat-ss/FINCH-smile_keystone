@@ -1,9 +1,26 @@
-<img src="img/logo.png" height="128">
-
-# Python Project Template
-A project.
-
 <img src="img/utat-logo.png" height="64">
+
+# Smile & Keystone - A Data Processing Project
+The Smile and Keystone project is a step under level 1B geometric correction of the FINCH Data Processing Pipeline. It's goal id to correct for the mis-mapping od spectral bands in the spectral (smile) and spatial dimesion (keystone)
+
+This repo contains all the code we created and adapted from different sources
+
+ ## Folders & Files (high level):
+1. **.gitignore** - tells git which files to ignore when committing the project
+1. **.pre-commit-config** - tells git what scripts to run when commiting (formatters to ensure good coding convention)
+1. **.vscode** - settings for vscode
+1. **pyproject.toml** - configurations of packages that run for this repo (can edit some stuff like Black line length, etc...)
+1. **README.md** - what you are currently reading right now
+
+1. **docs** - 
+1. **notebooks** - jupyter notebooks, use to write interactive function to easily see outputs, and show others outputs
+1. **tests** - unit test to test that each file/function in our code sitll works as intended
+1. **datasets** - contains all the file for each dataset we use to test/analyze our code
+1. **smile_keystone** - folder where we keep all our code
+
+    a. **_smile_** - code for smile correction
+
+    b. **_keystone_** - code for keystone correction
 
 # Contribution
 Instructions for contributing to this project are shown here.
