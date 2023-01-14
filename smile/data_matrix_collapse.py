@@ -1,4 +1,7 @@
 # Author: Andy
+# Step 1 of Smile. Takes a 3-dimensional array of size a*b*c, and returns a 2-dimensional array of size b*c
+#   with values equal to the averages of the columns of dimension a. In other words, replaces dimension a with 
+#   the mean of its values, collapsing the 3-D matrix into a 2-D one. 
 
 def data_matrix_collapse(image_file):
     ''' 
@@ -20,7 +23,7 @@ def data_matrix_collapse(image_file):
     # Read the input image and create a copy aimg with the same dimensions.
     Aimg = image_file
 
-    # Create a new empty matrix k, which has one dimension less than aimg (Instead of being spectral x row x col, it is spectral x row only)
+    # Create a new empty matrix k, which has one dimension less than aimg (Instead of being spectral x row x            col, it is spectral x row only)
     k = np.zeros((AdimSpectral, AdimWidth))  
     
 
