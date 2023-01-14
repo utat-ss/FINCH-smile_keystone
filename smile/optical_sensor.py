@@ -1,7 +1,12 @@
 # Author: Shuhan
-# This file defines the optical_sensor class object, which is initially defined in step 3 of Smile.
+# This file defines the optical_sensor class object, which is initially defined in step 3 of Smile. 
+# Following optical_sensor class object is the run_resampling_spectra function. This function executes the functionalities provided by optical_sensor, and is the only function that does so. 
+
+# ===IMPORTANT:===
+# It is necessary to import run_resampling_spectra while importing this file. 
 
 import numpy as np
+from matplotlib import pyplot as plt
 
 class optical_sensor:
 
@@ -64,3 +69,135 @@ class optical_sensor:
         self.raw_intensity = data_input[self.x_left_bound: self.x_right_bound]
         self.output = np.dot(self.raw_intensity, self.spectral_response)
         self.position = 0.5 * (self.x_left_bound + self.x_right_bound)
+
+
+def stretch_horizontal(to_be_stretched, target):
+    """
+    A linear transformation that stretches one array of any size, so it starts
+        and ends at the same points as the target array.
+
+    Args: 
+        to_be_stretched: the array that needs to be stretched
+        target: the array which length to_be_stretched needs to match
+
+    Outputs:
+        A 1D array, stretched input array
+    """
+    return np.array(to_be_stretched) * np.mean(np.diff(target)) + min(target)
+
+def run_resampling_spectra(data_input, srf_input:list or function, shift_range:tuple or int, show_plots = False, show_progress = True):
+    """
+    One function that runs it all. If the SRF for each sensor is unique, compile
+        them into a list in a low -> high wavelength order; if all sensors have 
+        the same SRF, input that SRF. 
+    
+    Shift is 0 by default, enter a different value if it is not 0. 
+
+    Args: 
+        data_input = the 2D collapsed data array for column-by-column resampling. 
+            Essentially output of Andy's code. There can also be only one column
+        srf_input = a list of spectral resposne functions for all the sensors.
+            If SRFs for all sensors are the same, then just enter one function.
+        shift_range = a tuple indicating the minimum and maximum shifts. For 
+            example, shift_range = (-5, 5) will produce shifts -5, -4, ..., 4, 5. 
+            Alternatively, if you want a single shift, just put a single value
+        show_plots = if true, shows plot. False by default. 
+        show_progress = if true, shows progress. True by default
+
+    Outputs: 
+        output: resampled spectra, a 1D array with the length = the # of sensors
+        sensor_pos: a 1D array indicating the centers of each sensor
+        spectral_response_demo: a 1D array that is the combination of spectral
+            response curves of each sensor
+    """
+    sampled_spectra_columns = []
+    sensor_pos_columns = []
+    srf_columns = []
+
+    input_shape = np.shape(data_input)
+
+    """If data_input is 1D, num_of_columns = 1; 
+    if data_input is 2D, num_of_columns = input_shape[0]
+    """
+    if len(input_shape) == 1:
+        num_of_columns = 1
+    else: 
+        num_of_columns = input_shape[0]
+
+    if type(shift_range) is tuple:
+        min_shift, max_shift = shift_range/wavelength_increment
+        shift_range = np.arange(min_shift, max_shift, g_shift_increment/wavelength_increment)
+    
+    else:
+        shift_range = [shift_range]
+
+    for column in range(num_of_columns):
+        """Run resampling for each column"""
+        if show_progress:
+            clear_output(wait=True)
+            print(f'Working through column {column}/{num_of_columns}')
+
+        if num_of_columns > 1:
+            """If there are more than 1 columns, pick out the column"""
+            data_temp = data_input[column]
+        else: 
+            """If there is only one column, the data is the column"""
+            data_temp = data_input
+
+        sampled_spectra_shift = []
+        sensor_pos_shift = []
+        srf_band_shift = []
+            
+        for shift in shift_range:
+            # optical_sensor.shift_constant = shift
+            sampled_spectra = []
+            sensor_pos = []
+            srf_band_temp = []
+
+            for bands in range(g_num_of_bands):
+                if srf_input is list:
+                    srf = srf_input[bands]
+                else:
+                    srf = srf_input
+
+                name_sensor = f'sensor{bands}'
+
+                single_sensor = optical_sensor(data_temp, bands, srf, shift)
+                single_sensor.shift_constant = shift
+
+                sampled_spectra.append(single_sensor.output)
+                sensor_pos.append(single_sensor.position)
+
+                x_for_demo = np.arange(0, 100)
+                srf_band_temp.append(single_sensor.spectral_response_function(x_for_demo))
+                srf_band = np.concatenate(srf_band_temp)
+            
+            sampled_spectra_shift.append(sampled_spectra)
+            sensor_pos_shift.append(sensor_pos)
+            srf_band_shift.append(srf_band)
+
+        sampled_spectra_columns.append(sampled_spectra_shift)
+        sensor_pos_columns.append(sensor_pos_shift) 
+        srf_columns.append(srf_band_shift) 
+
+    if show_plots:
+        if num_of_columns > 1:
+            print ("YouError: too many columns! This is on you.")
+
+        else:
+            fig, plot_for_show = plt.subplots(1, 1, figsize=(15, 7))
+
+            plot_for_show.plot(wavelength, data_input, label = 'Input data')
+            plot_for_show.set_xlabel('Wavelength [nm]') 
+            plot_for_show.set_ylabel('Radiance')
+            
+            for i in range(len(sampled_spectra_shift)): 
+                plot_for_show.scatter(stretch_horizontal(sensor_pos_shift, wavelength), sampled_spectra_shift, label = f'Resampled band {i}')
+                plot_for_show.plot(np.linspace(min(wavelength), max(wavelength), np.shape(srf_band_shift)[1]), srf_band_shift[i])
+            
+            plot_for_show.legend()
+
+    if num_of_columns == 1:
+        return sampled_spectra_shift, sensor_pos_shift, srf_band_shift
+
+    return sampled_spectra_columns, sensor_pos_columns, srf_columns 
