@@ -1,4 +1,5 @@
-from matplotlib import pyplot as plt
+# Author: Shuhan
+# Step 3 of Smile. This file creates reference and test spectra from the provided data cube
 
 def create_ref_and_test_spectra(crop_range:tuple, show_plots = False):
     """
@@ -18,12 +19,7 @@ def create_ref_and_test_spectra(crop_range:tuple, show_plots = False):
     crop_band_end = (crop_range[1] + 1) * band_length
     shift_bound = g_num_shifts_1D * g_shift_increment 
     shift_range = (-shift_bound, shift_bound)
-    # ============
-    # - The issue seems to occur within run_resampling_spectra
-    # - Try: 
-    #       1. Increase shift increment (probably not the way to go)
-    #       2. Make sure that the shift constant is actually passed into where it belongs
-    # ============
+
     sampled_reference_spectra, sensors_position_reference, srf_columns_reference = run_resampling_spectra(data_for_resampling[0], test_spectral_response, shift_range)
 
     sampled_test_spectra, sensors_position_test, srf_columns_test = run_resampling_spectra(data_for_resampling, test_spectral_response, 0) 
@@ -37,8 +33,6 @@ def create_ref_and_test_spectra(crop_range:tuple, show_plots = False):
         plot_for_show.plot(wavelength, data_for_resampling[0])
         plot_for_show.set_xlabel('Wavelength [nm]')
         plot_for_show.set_xlim(crop_band_start + min(wavelength), crop_band_end + min(wavelength))
-        #plot_for_show.vlines(crop_band_start + min(wavelength), ymin = 0, ymax = 20)
-        #plot_for_show.vlines(crop_band_end + min(wavelength), ymin = 0, ymax = 20)
 
         i = 0
         for shift in range(len(sampled_reference_spectra)):
