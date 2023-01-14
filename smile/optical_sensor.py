@@ -1,4 +1,5 @@
 # Author: Shuhan
+# This file defines the optical_sensor class object, which is initially defined in step 3 of Smile.
 
 import numpy as np
 
