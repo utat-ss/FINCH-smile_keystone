@@ -1,3 +1,9 @@
+# # # CRITICALLY IMPORTANT! In order to acccess these variables, you have two options:
+# # # 1. from config import * (Which will automatically let you access these as though they were defined in your current file)
+# # # 2. import config (Which will let you access these as config.variable_name ONLY. In other words you may need to rewrite your code)
+# # # The first option needs less revision to make work, but the second makes the job of your code linter easier. 
+# # # While testing, use option 1.
+
 # # package imports
 import numpy as np
 import matplotlib.pyplot as plt
