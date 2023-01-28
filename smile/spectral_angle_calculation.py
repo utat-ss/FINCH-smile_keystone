@@ -1,5 +1,6 @@
 # Author: Julia 
 # Step 5 of Smile. This file computes the spectral angle from the test and reference spectra
+from config import *
 
 def spectral_angle_calculation(test_spectra, ref_spectra, plot_col = -1):
     """ 

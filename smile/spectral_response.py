@@ -1,5 +1,6 @@
 # Author: Shuhan
 # This file contains mathematical functions that are currently placeholders for the sensor's spectral response functions. 
+from config import *
 
 def test_spectral_response(input):
     """

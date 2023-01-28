@@ -1,7 +1,10 @@
 # Author: Shuhan
 # Step 3 of Smile. This file creates reference and test spectra from the provided data cube
+from config import *
+from optical_sensor import *
 
-def create_ref_and_test_spectra(crop_range:tuple, show_plots = False):
+# ANDY'S NOTE: Added new arguments, data_for_resampling, to make it interface with main.py better.
+def create_ref_and_test_spectra(crop_range:tuple, data_for_resampling:list, test_spectral_response, show_plots = False):
     """
     Returns reference and test spectra. 
 
