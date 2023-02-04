@@ -1,5 +1,12 @@
 from config import *
 
+# # # UPDATE IMPERATIVES:
+# 1. Conglomerate all config variables into the main function.
+# 2. Group one-function files into larger, single files. 
+# 3. Handle imports of relevant packages in the scope of those files. 
+# 4. Have each function take in global variables as parameters (So they don't rely
+#    on the global scope, which is bad practice).
+
 # main is operational; but there's a *lot* we could be doing to make this cleaner. Todo. - Andy
 
 # Function imports
