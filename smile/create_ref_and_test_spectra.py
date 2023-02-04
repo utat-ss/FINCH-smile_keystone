@@ -1,13 +1,14 @@
 # Author: Shuhan
 # Step 3 of Smile. This file creates reference and test spectra from the provided data cube
 
-def create_ref_and_test_spectra(crop_range:tuple, show_plots = False):
+def create_ref_and_test_spectra(crop_range:tuple, show_plots = False, reference_spectra = 'empty'):
     """
     Returns reference and test spectra. 
 
     Args:
         crop_range: just enter the band numbers as (int, int). For example, enter crop_range = (0, 5) for showing bands 0~5 
         show_plot: boolean, set it to True if you need to show plots
+        reference_spectra: spot for an external reference data column. Without user input, the code automatically sources a data column from the data cube.
 
     Outputs:
         cropped_sampled_reference: cropped resampled reference spectra, which was originally generated using the first colum. 
@@ -20,13 +21,19 @@ def create_ref_and_test_spectra(crop_range:tuple, show_plots = False):
     shift_bound = g_num_shifts_1D * g_shift_increment 
     shift_range = (-shift_bound, shift_bound)
 
-    sampled_reference_spectra, sensors_position_reference, srf_columns_reference = run_resampling_spectra(data_for_resampling[0], test_spectral_response, shift_range)
+    if type(reference_spectra) is not np.array:
+        no_reference = True
+        ref_spectra = data_for_resampling[0]
+
+    sampled_reference_spectra, sensors_position_reference, srf_columns_reference = run_resampling_spectra(ref_spectra, test_spectral_response, shift_range)
 
     sampled_test_spectra, sensors_position_test, srf_columns_test = run_resampling_spectra(data_for_resampling, test_spectral_response, 0) 
     
     cropped_sampled_reference = [i[crop_range[0]:crop_range[1]] for i in  sampled_reference_spectra]
     cropped_sampled_test = [[j[crop_range[0]:crop_range[1]] for j in i] for i in sampled_test_spectra]
-            
+
+    if no_reference:
+        print('Reference spectra not found, used first column by default.')
 
     if show_plots:
         fig, plot_for_show = plt.subplots(1, 1, figsize = (21, 7))
