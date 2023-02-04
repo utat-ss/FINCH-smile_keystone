@@ -24,7 +24,6 @@ print("Imports completed, no issues.")
 
 #Andy
 if __name__ == '__main__':
-  # skeleton setup, currently nonfunctional. Continuing to work on inputs.
 
   data = radianceData
   wavelength_input = wavelength
