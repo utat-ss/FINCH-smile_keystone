@@ -44,6 +44,7 @@ def create_ref_and_test_spectra(crop_range:tuple, data_for_resampling:list, test
         plot_for_show.plot(wavelength, data_for_resampling[0])
         plot_for_show.set_xlabel('Wavelength [nm]')
         plot_for_show.set_xlim(crop_band_start + min(wavelength), crop_band_end + min(wavelength))
+        plot_for_show.set_title(f'Cropped bands from {crop_band_start + min(wavelength)}nm to {crop_band_end + min(wavelength)}nm')
 
         i = 0
         for shift in range(len(sampled_reference_spectra)):
@@ -51,6 +52,13 @@ def create_ref_and_test_spectra(crop_range:tuple, data_for_resampling:list, test
             plot_for_show.plot(np.linspace(min(wavelength), max(wavelength), len(srf_columns_reference[i])), srf_columns_reference[i], label = f"shift = {shift}")
             i += 1
         
+        annotate_coords_x = stretch_horizontal(sensors_position_reference[0], wavelength)
+        annotate_coords_y = np.array(sampled_reference_spectra[0]) * 0.8
+
+        for i in range(len(annotate_coords_x)):
+            label_text = f"Band {round(annotate_coords_x[i] - 0.5*band_length)}nm to {round(annotate_coords_x[i] + 0.5*band_length)}nm"
+            plot_for_show.annotate(label_text, (annotate_coords_x[i], annotate_coords_y[i]))
+
         plot_for_show.legend(loc = 'center left', ncol = 1, bbox_to_anchor = (1, 0.5))
         fig.savefig(f'Demo')
 
