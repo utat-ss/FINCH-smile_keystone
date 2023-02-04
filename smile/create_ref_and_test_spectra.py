@@ -1,5 +1,7 @@
 # Author: Shuhan
 # Step 3 of Smile. This file creates reference and test spectra from the provided data cube
+from config import *
+from optical_sensor import *
 
 def create_ref_and_test_spectra(crop_range:tuple, show_plots = False, reference_spectra = 'empty'):
     """

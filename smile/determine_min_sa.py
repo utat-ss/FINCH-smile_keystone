@@ -1,5 +1,6 @@
 # Author: Rediet
 # Step 6 of Smile. This file calculates the minium spectral angle. 
+from config import *
 
 def determine_min_sa(sa_deg):
   """Calculates the minimum spectral angle

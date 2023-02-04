@@ -2,6 +2,7 @@
 # Step 8 of Smile. Function that performs spline interpolation on one pixel's spectra.
 # The original code also generates plots, but the plot-creating lines of code have been inhibited for now.
 # Call function spline_interpolation_all to utilize this file's codes. 
+from config import *
 
 def spline_interpolation_1_pixel(test_spectra_rad,test_spectra_wav, interp_step):
 
