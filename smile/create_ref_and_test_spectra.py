@@ -3,12 +3,14 @@
 from config import *
 from optical_sensor import *
 
-def create_ref_and_test_spectra(crop_range:tuple, show_plots = False, reference_spectra = 'empty'):
+def create_ref_and_test_spectra(crop_range:tuple, data_for_resampling:list, test_spectral_response, show_plots = False, reference_spectra = 'empty'):
     """
     Returns reference and test spectra. 
 
     Args:
         crop_range: just enter the band numbers as (int, int). For example, enter crop_range = (0, 5) for showing bands 0~5 
+        data_for_resampling: the data that is being resampled and processed for SMILE correction
+        test_spectral_response: a mathematical function simulating each pixel's spectral response
         show_plot: boolean, set it to True if you need to show plots
         reference_spectra: spot for an external reference data column. Without user input, the code automatically sources a data column from the data cube.
 
