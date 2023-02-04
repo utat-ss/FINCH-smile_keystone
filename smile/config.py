@@ -12,16 +12,17 @@ import math
 from scipy import stats
 from IPython.display import clear_output
 
-# VERY INEFFICIENT. HOWEVER, THIS IS FUNCTIONAL. FIGURE OUT A WAY TO NOT NEED TO RELOAD THE DATACUBE EVERY TIME CONFIG IS CALLED
+# Recursively import the whole lot of functions
 import load_datacube_npy
 
 # # indian pine array data
-indian_pine_array = np.load('utat-ss/FINCH-smile_keystone/data/indian_pine_array.npy')
-indian_pine_wavelength = np.load('utat-ss/FINCH-smile_keystone/data/indian_pine_wavelength.txt')
-
+indian_pine_array_filepath = 'data\indian_pine_array.npy'
+indian_pine_array = np.load(indian_pine_array_filepath)
+indian_pine_wavelength_filepath = 'data\indian_pine_wavelength.txt'
+indian_pine_wavelength = np.load(indian_pine_array_filepath)
 
 # # Global Vars
-wavelength_source, radianceData, g_data_dim, wavelength, wavelength_increment = load_datacube_npy.ldn(indian_pine_array, indian_pine_wavelength)
+wavelength_source, radianceData, g_data_dim, wavelength, wavelength_increment = load_datacube_npy.ldn(indian_pine_array_filepath, indian_pine_wavelength_filepath)
 
 #wavelength_source, radianceData, g_data_dim = load_datacube('/pavia.npy', '/content/Science/fall_2021_onboarding/wavelength.txt')
 

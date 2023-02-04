@@ -2,6 +2,7 @@
 # Step 1 of Smile. Takes a 3-dimensional array of size a*b*c, and returns a 2-dimensional array of size b*c
 #   with values equal to the averages of the columns of dimension a. In other words, replaces dimension a with 
 #   the mean of its values, collapsing the 3-D matrix into a 2-D one. 
+from config import *
 
 def data_matrix_collapse(image_file):
     ''' 

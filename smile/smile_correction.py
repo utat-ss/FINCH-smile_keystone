@@ -1,5 +1,7 @@
 # Author: Shuhan and Andy
 # The final step of Smile. This file applies the reverse of the calculated shift to apply smile correction. 
+from config import *
+from optical_sensor import run_resampling_spectra
 
 def smile_correction(interpolated_data, calculated_shift, srf):
     """Use run_resampling_spectra with the reverse of the calculated shift to apply smile correction.
