@@ -2,41 +2,41 @@
 # This file extracts an array of data from MODTRAN corresponding to a specific feature
 
 def extract_from_MODTRAN(json: dict, feature_wavelength: int, deeper_by = 0) -> np.array:
-  """This function returns an array of data points corresposnding to the specific feature.
-  
-  Args:
-      json = the docs_json variable copied from the website source
-      feature_wavelength = the feature wavelength around which data is to be extracted
-      deeper_by = the amount by which the y-axis is to be lowered in order to fit in with the satellite data
-      
-  Outputs:
-      np.array consisting of x and y axis data points, wavelength in nm on x-axis and transmittance on the y-axis"""
-  key = list(json.keys())[0]
-  ind = 0
-  for i in range(len(json[key]['roots']['references'])):
-      if 'data' in json[key]['roots']['references'][i]['attributes']:
-          ind = i
-
-  xpoint = np.array(
-      json[key]['roots']['references'][ind]['attributes']['data']['x'])
-  ypoints = np.array(
-      json[key]['roots']['references'][ind]['attributes']['data']['y'])
-  xpoints = np.array([d * 1000 for d in xpoint])
-
-  n1, n2 = feature_wavelength - 50, feature_wavelength + 50
-  xp = np.array([d for d in xpoints if n1 < d < n2])
-  pos = [list(xpoints).index(d) for d in list(xpoints) if n1 < d < n2]
-  optimised = []
-  for i in pos:
-      if ypoints[i] < 0.87:
-          optimised.append(ypoints[i] - deeper_by)
-      else:
-          optimised.append(ypoints[i])
-  yp = np.array(optimised)
-  plt.plot(xp, yp)
-  plt.show()
-  
-  return np.array([xp, yp])
+    """This function returns an array of data points corresposnding to the specific feature.
+    
+    Args:
+        json = the docs_json variable copied from the website source
+        feature_wavelength = the feature wavelength around which data is to be extracted
+        deeper_by = the amount by which the y-axis is to be lowered in order to fit in with the satellite data
+        
+    Outputs:
+        np.array consisting of x and y axis data points, wavelength in nm on x-axis and transmittance on the y-axis"""
+    key = list(json.keys())[0]
+    ind = 0
+    for i in range(len(json[key]['roots']['references'])):
+        if 'data' in json[key]['roots']['references'][i]['attributes']:
+            ind = i
+    
+    xpoint = np.array(
+        json[key]['roots']['references'][ind]['attributes']['data']['x'])
+    ypoints = np.array(
+        json[key]['roots']['references'][ind]['attributes']['data']['y'])
+    xpoints = np.array([d * 1000 for d in xpoint])
+    
+    n1, n2 = feature_wavelength - 50, feature_wavelength + 50
+    xp = np.array([d for d in xpoints if n1 < d < n2])
+    pos = [list(xpoints).index(d) for d in list(xpoints) if n1 < d < n2]
+    optimised = []
+    for i in pos:
+        if ypoints[i] < 0.87:
+            optimised.append(ypoints[i] - deeper_by)
+        else:
+            optimised.append(ypoints[i])
+    yp = np.array(optimised)
+    plt.plot(xp, yp)
+    plt.show()
+    
+    return np.array([xp, yp])
 
 
 doc = {"56b32a2b-fe9c-4115-8c3f-c692609fd3e1":{"roots":{"references":[{"attributes":{"text":""},"id":"51570","type":"Title"},
