@@ -1,14 +1,15 @@
-# Author: Unknown
+# Author: Shivesh Prakash
 # This file extracts an array of data from MODTRAN corresponding to a specific feature
 
-def extract_from_MODTRAN(json: dict, feature_wavelength: int, deeper_by = 0) -> np.array:
+def extract_from_MODTRAN(json: dict, feature_wavelength: int, deeper_by=0, wider_by=0) -> np.array:
     """This function returns an array of data points corresposnding to the specific feature.
-    
+
     Args:
         json = the docs_json variable copied from the website source
         feature_wavelength = the feature wavelength around which data is to be extracted
         deeper_by = the amount by which the y-axis is to be lowered in order to fit in with the satellite data
-        
+        wider_by = the amount by which the x-axis is to be widened in order to fit in with the satellite data
+
     Outputs:
         np.array consisting of x and y axis data points, wavelength in nm on x-axis and transmittance on the y-axis"""
     key = list(json.keys())[0]
@@ -16,28 +17,37 @@ def extract_from_MODTRAN(json: dict, feature_wavelength: int, deeper_by = 0) -> 
     for i in range(len(json[key]['roots']['references'])):
         if 'data' in json[key]['roots']['references'][i]['attributes']:
             ind = i
-    
+
     xpoint = np.array(
         json[key]['roots']['references'][ind]['attributes']['data']['x'])
     ypoints = np.array(
         json[key]['roots']['references'][ind]['attributes']['data']['y'])
     xpoints = np.array([d * 1000 for d in xpoint])
-    
+
     n1, n2 = feature_wavelength - 50, feature_wavelength + 50
-    xp = np.array([d for d in xpoints if n1 < d < n2])
+    xp_temp = np.array([d for d in xpoints if n1 < d < n2])
     pos = [list(xpoints).index(d) for d in list(xpoints) if n1 < d < n2]
-    optimised = []
+    optimised_y = []
+    optimised_x = []
     for i in pos:
-        if ypoints[i] < 0.87:
-            optimised.append(ypoints[i] - deeper_by)
+        if ypoints[i] < 0.91:
+            optimised_y.append(ypoints[i] - deeper_by)
         else:
-            optimised.append(ypoints[i])
-    yp = np.array(optimised)
+            optimised_y.append(ypoints[i])
+    x_of_min = xp_temp[np.argmin(ypoints[pos])]
+    for point in xp_temp:
+        if point < x_of_min:
+            optimised_x.append(point - wider_by)
+        elif point > x_of_min:
+            optimised_x.append(point + wider_by)
+        else:
+            optimised_x.append(point)
+    yp = np.array(optimised_y)
+    xp = np.array(optimised_x)
     plt.plot(xp, yp)
     plt.show()
-    
-    return np.array([xp, yp])
 
+    return np.array([xp, yp])
 
 doc = {"56b32a2b-fe9c-4115-8c3f-c692609fd3e1":{"roots":{"references":[{"attributes":{"text":""},"id":"51570","type":"Title"},
     {"attributes":{"bottom_units":"screen","fill_alpha":{"value":0.5},"fill_color":{"value":"lightgrey"},"left_units":"screen","level":"overlay","line_alpha":
@@ -66,4 +76,4 @@ doc = {"56b32a2b-fe9c-4115-8c3f-c692609fd3e1":{"roots":{"references":[{"attribut
         ,{"attributes":{},"id":"51572","type":"BasicTickFormatter"}],"root_ids":["51530"]},"title":"Bokeh Application","version":"1.4.0"}}
 
 
-extract_from_MODTRAN(doc, 1450)
+extract_from_MODTRAN(doc, 1450, deeper_by=0.1, wider_by=3)
