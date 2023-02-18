@@ -1,13 +1,15 @@
-from config import *
-
 # # # UPDATE IMPERATIVES:
-# 1. Conglomerate all config variables into the main function.
+# 1. Conglomerate all config variables into the main function. DONE
 # 2. Group one-function files into larger, single files. 
 # 3. Handle imports of relevant packages in the scope of those files. 
 # 4. Have each function take in global variables as parameters (So they don't rely
 #    on the global scope, which is bad practice).
 
 # main is operational; but there's a *lot* we could be doing to make this cleaner. Todo. - Andy
+
+
+import numpy as np
+import load_datacube_npy
 
 # # indian pine array data
 indian_pine_array_filepath = 'data\indian_pine_array.npy'
@@ -30,16 +32,20 @@ g_shift_increment = .2 #nanometers
 g_total_shifts = int(2*(g_num_shifts_1D/g_shift_increment)+1)
 
 
-# Function imports
-from create_ref_and_test_spectra import create_ref_and_test_spectra
-from data_matrix_collapse import data_matrix_collapse
-from determine_min_sa import determine_min_sa
-from load_datacube_npy import ldn
-import optical_sensor
-from spectral_angle_calculation import spectral_angle_calculation
-from spectral_response import test_spectral_response, make_random_SRFs
-from smile_correction import smile_correction
-from spline_interpolation import  spline_interpolation_1_pixel, spline_interpolation_all
+# Function imports (DEPRECATED)
+  # from create_ref_and_test_spectra import create_ref_and_test_spectra
+  # from data_matrix_collapse import data_matrix_collapse
+  # from determine_min_sa import determine_min_sa
+  # from load_datacube_npy import ldn
+  # import optical_sensor
+  # from spectral_angle_calculation import spectral_angle_calculation
+  # from spectral_response import test_spectral_response, make_random_SRFs
+  # from smile_correction import smile_correction
+  # from spline_interpolation import  spline_interpolation_1_pixel, spline_interpolation_all
+
+#Function imports
+from Quantificationfns import *
+from Correctionfns import *
 
 print("Imports completed, no issues.")
 
