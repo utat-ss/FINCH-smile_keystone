@@ -4,6 +4,8 @@ import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
 
+from optical_sensor import *
+
 # Author: Andy
 # Step 1 of Smile. Takes a 3-dimensional array of size a*b*c, and returns a 2-dimensional array of size b*c
 #   with values equal to the averages of the columns of dimension a. In other words, replaces dimension a with 
@@ -68,7 +70,7 @@ def test_spectral_response(input):
     
     return normed_gaussian
 
-def make_random_SRFs(input):
+def make_random_SRFs(input, g_num_of_bands):
     """
     Generates a list of unique and random Gaussian SRFs for each pixel. The parameters of each
         generated Gaussian function is a random number between 0 and 1. These random numbers 
@@ -106,9 +108,7 @@ def make_random_SRFs(input):
 
 # Author: Shuhan
 # Step 3 of Smile. This fn creates reference and test spectra from the provided data cube
-from optical_sensor import *
-
-def create_ref_and_test_spectra(crop_range:tuple, data_for_resampling:list, test_spectral_response, show_plots = False, reference_spectra = 'empty'):
+def create_ref_and_test_spectra(crop_range:tuple, data_for_resampling:list, test_spectral_response, wavelength, g_num_of_bands, g_num_shifts_1D, g_shift_increment, show_plots = False, reference_spectra = 'empty'):
     """
     Returns reference and test spectra. 
 
@@ -172,7 +172,7 @@ def create_ref_and_test_spectra(crop_range:tuple, data_for_resampling:list, test
 # Author: Julia 
 # Step 5 of Smile. This fn computes the spectral angle from the test and reference spectra
 
-def spectral_angle_calculation(test_spectra, ref_spectra, plot_col = -1):
+def spectral_angle_calculation(test_spectra, ref_spectra, g_data_dim, plot_col = -1, ):
     """ 
     Calculates the spectral angle
       
@@ -203,7 +203,7 @@ def spectral_angle_calculation(test_spectra, ref_spectra, plot_col = -1):
 
 # Author: Rediet
 # Step 6 of Smile. This fn calculates the minimum spectral angle.  
-def determine_min_sa(sa_deg):
+def determine_min_sa(sa_deg, g_data_dim):
   """Calculates the minimum spectral angle
     Variables used: 
     min_each_row[g_data_dim[2]] holds the minimum value of each row in sa_deg (comparing between shifts for each column of the data)
