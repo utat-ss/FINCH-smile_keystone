@@ -9,6 +9,27 @@ from config import *
 
 # main is operational; but there's a *lot* we could be doing to make this cleaner. Todo. - Andy
 
+# # indian pine array data
+indian_pine_array_filepath = 'data\indian_pine_array.npy'
+indian_pine_array = np.load(indian_pine_array_filepath)
+indian_pine_wavelength_filepath = 'data\indian_pine_wavelength.txt'
+indian_pine_wavelength = np.load(indian_pine_array_filepath)
+
+# # Global Vars
+wavelength_source, radianceData, g_data_dim, wavelength, wavelength_increment = load_datacube_npy.ldn(indian_pine_array_filepath, indian_pine_wavelength_filepath)
+
+#wavelength_source, radianceData, g_data_dim = load_datacube('/pavia.npy', '/content/Science/fall_2021_onboarding/wavelength.txt')
+
+#number of spectral pixels we're assuming our instrument has. 
+
+#The g_data_dim[0] bands of reference spectra will be resampled to g_num_of_bands points
+g_num_of_bands = 70 
+
+g_num_shifts_1D = 5
+g_shift_increment = .2 #nanometers
+g_total_shifts = int(2*(g_num_shifts_1D/g_shift_increment)+1)
+
+
 # Function imports
 from create_ref_and_test_spectra import create_ref_and_test_spectra
 from data_matrix_collapse import data_matrix_collapse
