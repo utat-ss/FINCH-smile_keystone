@@ -60,12 +60,12 @@ if __name__ == '__main__':
   # # # Quantification
   column_averaged_spectra = data_matrix_collapse(data) # Step 1: Generate Column Averaged Spectra.
   demo_SRF = test_spectral_response # Step 2: Generate SRFs.
-  ref_spectra, test_spectra = create_ref_and_test_spectra((0,1000), column_averaged_spectra, demo_SRF) # Step 3, 4: Generate Reference and Test spectra. (0,100) is also a placeholder
-  sa_deg = spectral_angle_calculation(test_spectra, ref_spectra) # Step 5: Calculate spectral angle from test and reference spectra.
-  min_spectral_angle = determine_min_sa(sa_deg) # Step 6: Determine minimum spectral angle.
+  ref_spectra, test_spectra = create_ref_and_test_spectra((0,1000), column_averaged_spectra, demo_SRF, wavelength, g_num_of_bands, g_num_shifts_1D, g_shift_increment) # Step 3, 4: Generate Reference and Test spectra. (0,100) is also a placeholder
+  sa_deg = spectral_angle_calculation(test_spectra, ref_spectra, g_data_dim) # Step 5: Calculate spectral angle from test and reference spectra.
+  min_spectral_angle = determine_min_sa(sa_deg, g_data_dim) # Step 6: Determine minimum spectral angle.
 
   print("Quantification complete, no issues.")
-
+  
   # # # Correction
   # Step 7: Apply reverse of Quantified shifts to SRFs. DEPRECATED. STEP 7 IS NOW BUNDLED INTO STEP 9.
   # reverse_shifted_SRFS = reverse_shift(data, demo_SRF, min_spectral_angle) 

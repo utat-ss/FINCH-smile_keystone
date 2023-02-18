@@ -1,5 +1,4 @@
 import numpy as np
-from config import *
 def ldn(datacube_filepath, wavelength_filepath):
   data = np.load(datacube_filepath)
   wavelength_source = np.loadtxt(wavelength_filepath)[20:]
