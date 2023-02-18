@@ -1,16 +1,15 @@
 # Author: Shuhan
-# This file defines the optical_sensor class object, which is initially defined in step 3 of Smile. 
-# Following optical_sensor class object is the run_resampling_spectra function. This function executes the functionalities provided by optical_sensor, and is the only function that does so. 
+# This file defines the optical_sensor class object, which is initially defined in step 3 of Smile.
+# Following optical_sensor class object is the run_resampling_spectra function. This function executes the functionalities provided by optical_sensor, and is the only function that does so.
 
 # ===IMPORTANT:===
-# It is necessary to import run_resampling_spectra while importing this file. 
+# It is necessary to import run_resampling_spectra while importing this file.
 
 import numpy as np
 from matplotlib import pyplot as plt
-from config import *
-
+from IPython.display import clear_output
 class optical_sensor:
-
+    """This class object is used to resample spectra. It is the core of Smile's spectra resampling algorithm, which is used in many places."""
     def __init__(self, data_input, sensor_number:int, spectral_response_function1, shift_constant):
         """Note: domain of each sensor's spectral response function (SRF) is 
             currently unknown, here I'm assuming that it's based on the physical 
@@ -37,22 +36,18 @@ class optical_sensor:
         self.name = f'sensor_{sensor_number}'
         # each sensor may have a different SRF, or they may not. 
         # SRFs are mathematical expressions describing how sensors respond to 
-        # photons landing on different parts of the sensor (refer to how
-        # hyperspecral cameras work)
+        # photons landing on different parts of the sensor (refer to how hyperspecral cameras work)
         self.spectral_response_function = spectral_response_function1 #changed to 1 to avoid dupes
 
-        # x_left_bound and x_right_bound are the given CCD's spectral range in
-        # terms of the indices of the raw data array.
+        # x_left_bound and x_right_bound are the given CCD's spectral range in terms of the indices of the raw data array.
         # x_left_bound and x_right_bound are the single sensor's spectral range.
-        # For convenience's sake, they are in terms of indices of the raw data 
-        # array (0 ~ N for len(data) == N)
+        # For convenience's sake, they are in terms of indices of the raw data array (0 ~ N for len(data) == N)
         sensor_width = len(data_input) / g_num_of_bands
 
         self.x_left_bound = int(sensor_number * sensor_width)
         self.x_right_bound = int((1 + sensor_number) * sensor_width)
         
-        # an arbitrary x axis for the SRF, origin is seated on the left bound of
-        # the sensor in question, ends at the sensor's right bound
+        # An arbitrary x axis for the SRF, origin is seated on the left bound of the sensor in question, ends at the sensor's right bound
         x_axis = np.arange(0, self.x_right_bound - self.x_left_bound)
         x_axis_demo = np.linspace(0, self.x_right_bound - self.x_left_bound, 100)
 
@@ -61,12 +56,9 @@ class optical_sensor:
         self.spectral_response = self.spectral_response_function(x_axis + self.shift_constant)
         self.spectral_response_demo = self.spectral_response_function(x_axis_demo + self.shift_constant)
 
-        # Now that we have the spectral response curve, we simply need to do the
-        # dot product between the spectral response curve and the corresponding 
+        # Now that we have the spectral response curve, we simply need to do the dot product between the spectral response curve and the corresponding 
         # segment of the actual data
-        # The dot product = the sensor's total output, since in Python, the 
-        # spectral response curve and the corresponding segment of data are 1xN 
-        # matrices of the same length.
+        # The dot product = the sensor's total output, since in Python, the  spectral response curve and the corresponding segment of data are 1xN matrices of the same length.
         self.raw_intensity = data_input[self.x_left_bound: self.x_right_bound]
         self.output = np.dot(self.raw_intensity, self.spectral_response)
         self.position = 0.5 * (self.x_left_bound + self.x_right_bound)
@@ -86,7 +78,7 @@ def stretch_horizontal(to_be_stretched, target):
     """
     return np.array(to_be_stretched) * np.mean(np.diff(target)) + min(target)
 
-def run_resampling_spectra(data_input, srf_input:list or function, shift_range:tuple or int, show_plots = False, show_progress = True):
+def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int, g_num_of_bands, g_shift_increment, show_plots = False, show_progress = True):
     """
     One function that runs it all. If the SRF for each sensor is unique, compile
         them into a list in a low -> high wavelength order; if all sensors have 
@@ -115,40 +107,40 @@ def run_resampling_spectra(data_input, srf_input:list or function, shift_range:t
     sensor_pos_columns = []
     srf_columns = []
 
+    wavelength_increment = wavelength[1] - wavelength[0]
     input_shape = np.shape(data_input)
 
-    """If data_input is 1D, num_of_columns = 1; 
-    if data_input is 2D, num_of_columns = input_shape[0]
-    """
+    # If data_input is 1D, num_of_columns = 1;
+    # if data_input is 2D, num_of_columns = input_shape[0]
     if len(input_shape) == 1:
         num_of_columns = 1
-    else: 
+    else:
         num_of_columns = input_shape[0]
 
-    if type(shift_range) is tuple:
+    if isinstance(shift_range, tuple):
         min_shift, max_shift = shift_range/wavelength_increment
         shift_range = np.arange(min_shift, max_shift, g_shift_increment/wavelength_increment)
-    
+
     else:
         shift_range = [shift_range]
 
     for column in range(num_of_columns):
-        """Run resampling for each column"""
+        # Run resampling for each column
         if show_progress:
             clear_output(wait=True)
             print(f'Working through column {column}/{num_of_columns}')
 
         if num_of_columns > 1:
-            """If there are more than 1 columns, pick out the column"""
+            # If there are more than 1 columns, pick out the column
             data_temp = data_input[column]
-        else: 
-            """If there is only one column, the data is the column"""
+        else:
+            # If there is only one column, the data is the column
             data_temp = data_input
 
         sampled_spectra_shift = []
         sensor_pos_shift = []
         srf_band_shift = []
-            
+
         for shift in shift_range:
             # optical_sensor.shift_constant = shift
             sampled_spectra = []
@@ -161,8 +153,6 @@ def run_resampling_spectra(data_input, srf_input:list or function, shift_range:t
                 else:
                     srf = srf_input
 
-                name_sensor = f'sensor{bands}'
-
                 single_sensor = optical_sensor(data_temp, bands, srf, shift)
                 single_sensor.shift_constant = shift
 
@@ -172,7 +162,7 @@ def run_resampling_spectra(data_input, srf_input:list or function, shift_range:t
                 x_for_demo = np.arange(0, 100)
                 srf_band_temp.append(single_sensor.spectral_response_function(x_for_demo))
                 srf_band = np.concatenate(srf_band_temp)
-            
+
             sampled_spectra_shift.append(sampled_spectra)
             sensor_pos_shift.append(sensor_pos)
             srf_band_shift.append(srf_band)
@@ -189,14 +179,15 @@ def run_resampling_spectra(data_input, srf_input:list or function, shift_range:t
             fig, plot_for_show = plt.subplots(1, 1, figsize=(15, 7))
 
             plot_for_show.plot(wavelength, data_input, label = 'Input data')
-            plot_for_show.set_xlabel('Wavelength [nm]') 
+            plot_for_show.set_xlabel('Wavelength [nm]')
             plot_for_show.set_ylabel('Radiance')
-            
+
             for i in range(len(sampled_spectra_shift)): 
                 plot_for_show.scatter(stretch_horizontal(sensor_pos_shift, wavelength), sampled_spectra_shift, label = f'Resampled band {i}')
                 plot_for_show.plot(np.linspace(min(wavelength), max(wavelength), np.shape(srf_band_shift)[1]), srf_band_shift[i])
-            
+
             plot_for_show.legend()
+            fig.tight_layout()
 
     if num_of_columns == 1:
         return sampled_spectra_shift, sensor_pos_shift, srf_band_shift
