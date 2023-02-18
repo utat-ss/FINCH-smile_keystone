@@ -20,10 +20,10 @@ wavelength_source, radianceData, g_data_dim, wavelength, wavelength_increment = 
 
 #wavelength_source, radianceData, g_data_dim = load_datacube('/pavia.npy', '/content/Science/fall_2021_onboarding/wavelength.txt')
 
-#number of spectral pixels we're assuming our instrument has. 
+#number of spectral pixels we're assuming our instrument has.
 
 #The g_data_dim[0] bands of reference spectra will be resampled to g_num_of_bands points
-g_num_of_bands = 70 
+g_num_of_bands = 70
 
 g_num_shifts_1D = 5
 g_shift_increment = .2 #nanometers
