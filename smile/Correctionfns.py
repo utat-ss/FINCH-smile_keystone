@@ -60,7 +60,7 @@ def spline_interpolation_1_pixel(test_spectra_rad, test_spectra_wav, interp_step
 
 # Author: Julia
 # The following function execute Radiet's spline interpolation function
-def spline_interpolation_all(test_spectra_rad_all,test_spectra_wav, interp_step, g_data_dim):
+def spline_interpolation_all(test_spectra_rad_all,test_spectra_wav, interp_step, g_data_dim, wavelength):
     """ Generates spline interpolation of test spectral data for all pixels 
       
         Args:
@@ -91,7 +91,7 @@ def spline_interpolation_all(test_spectra_rad_all,test_spectra_wav, interp_step,
 # Author: Shuhan and Andy
 # The final step of Smile. This file applies the reverse of the calculated shift to apply smile correction
 
-def smile_correction(interpolated_data, calculated_shift, srf):
+def smile_correction(interpolated_data, calculated_shift, srf, g_num_of_bands, g_shift_increment, wavelength):
     """Use run_resampling_spectra with the reverse of the calculated shift to apply smile correction.
     First, take out a 2D array of data that has the same row
 
@@ -129,7 +129,7 @@ def smile_correction(interpolated_data, calculated_shift, srf):
             shift_constant = calculated_shift[count]
             isolated_spectra = row
 
-            corrected_spectra, _, _ = run_resampling_spectra(isolated_spectra, srf, shift_constant, show_progress=False)
+            corrected_spectra, _, _ = run_resampling_spectra(isolated_spectra, srf, shift_constant, g_num_of_bands, g_shift_increment, wavelength, show_progress=False)
             output_temp.append(corrected_spectra[0])
 
         corrected_spectra_collection.append(output_temp)

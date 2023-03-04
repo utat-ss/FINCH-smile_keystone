@@ -10,6 +10,7 @@ from matplotlib import pyplot as plt
 from IPython.display import clear_output
 class optical_sensor:
     """This class object is used to resample spectra. It is the core of Smile's spectra resampling algorithm, which is used in many places."""
+    
     def __init__(self, data_input, sensor_number:int, spectral_response_function1, shift_constant):
         """Note: domain of each sensor's spectral response function (SRF) is 
             currently unknown, here I'm assuming that it's based on the physical 
@@ -29,6 +30,7 @@ class optical_sensor:
             self.spectral_response: the spectral response curve [1D array with 
                 length = # of sensors]
         """
+        g_num_of_bands = 70
         #data_input = data_for_resampling[col_num]
 
         # from shorter wavelengths to longer wavelengths, assign each sensor 
@@ -78,7 +80,7 @@ def stretch_horizontal(to_be_stretched, target):
     """
     return np.array(to_be_stretched) * np.mean(np.diff(target)) + min(target)
 
-def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int, g_num_of_bands, g_shift_increment, show_plots = False, show_progress = True):
+def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int, g_num_of_bands, g_shift_increment, wavelength, show_plots = False, show_progress = True):
     """
     One function that runs it all. If the SRF for each sensor is unique, compile
         them into a list in a low -> high wavelength order; if all sensors have 

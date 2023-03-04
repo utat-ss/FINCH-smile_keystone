@@ -134,9 +134,9 @@ def create_ref_and_test_spectra(crop_range:tuple, data_for_resampling:list, test
         no_reference = True
         ref_spectra = data_for_resampling[0]
 
-    sampled_reference_spectra, sensors_position_reference, srf_columns_reference = run_resampling_spectra(ref_spectra, test_spectral_response, shift_range, g_num_of_bands, g_shift_increment)
+    sampled_reference_spectra, sensors_position_reference, srf_columns_reference = run_resampling_spectra(ref_spectra, test_spectral_response, shift_range, g_num_of_bands, g_shift_increment, wavelength)
 
-    sampled_test_spectra, sensors_position_test, srf_columns_test = run_resampling_spectra(data_for_resampling, test_spectral_response, 0, g_num_of_bands, g_shift_increment)
+    sampled_test_spectra, sensors_position_test, srf_columns_test = run_resampling_spectra(data_for_resampling, test_spectral_response, 0, g_num_of_bands, g_shift_increment, wavelength)
     
     cropped_sampled_reference = [i[crop_range[0]:crop_range[1]] for i in  sampled_reference_spectra]
     cropped_sampled_test = [[j[crop_range[0]:crop_range[1]] for j in i] for i in sampled_test_spectra]
