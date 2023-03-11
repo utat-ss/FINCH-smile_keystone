@@ -53,25 +53,40 @@ print(wavelength[1])
 #Andy
 if __name__ == '__main__':
 
-  data = radianceData
-  wavelength_input = wavelength
-  wavelength_increment_input = wavelength_increment
-  # Globals further defined here in case we want to pass in other data
+    data = radianceData
+    wavelength_input = wavelength
+    wavelength_increment_input = wavelength_increment
+    # Globals further defined here in case we want to pass in other data
 
-  # # # Quantification
-  column_averaged_spectra = data_matrix_collapse(data) # Step 1: Generate Column Averaged Spectra.
-  demo_SRF = test_spectral_response # Step 2: Generate SRFs.
-  ref_spectra, test_spectra = create_ref_and_test_spectra((0,1000), column_averaged_spectra, demo_SRF, wavelength_input, g_num_of_bands, g_num_shifts_1D, g_shift_increment, wavelength_increment) # Step 3, 4: Generate Reference and Test spectra. (0,100) is also a placeholder
-  sa_deg = spectral_angle_calculation(test_spectra, ref_spectra, g_data_dim) # Step 5: Calculate spectral angle from test and reference spectra.
-  min_spectral_angle = determine_min_sa(sa_deg, g_data_dim) # Step 6: Determine minimum spectral angle.
+    # # # Quantification
+    column_averaged_spectra = data_matrix_collapse(data) # Step 1: Generate Column Averaged Spectra.
+    demo_SRF = test_spectral_response # Step 2: Generate SRFs.
+    ref_spectra, test_spectra = create_ref_and_test_spectra((0,1000), column_averaged_spectra, demo_SRF, wavelength_input, g_num_of_bands, g_num_shifts_1D, g_shift_increment, wavelength_increment) # Step 3, 4: Generate Reference and Test spectra. (0,100) is also a placeholder
+    sa_deg = spectral_angle_calculation(test_spectra, ref_spectra, g_data_dim) # Step 5: Calculate spectral angle from test and reference spectra.
+    min_spectral_angle = determine_min_sa(sa_deg, g_data_dim) # Step 6: Determine minimum spectral angle.
 
-  print("Quantification complete, no issues.")
-  
-  # # # Correction
-  # Step 7: Apply reverse of Quantified shifts to SRFs. DEPRECATED. STEP 7 IS NOW BUNDLED INTO STEP 9.
-  # reverse_shifted_SRFS = reverse_shift(data, demo_SRF, min_spectral_angle) 
-  spectra_wav, spectra_rad = spline_interpolation_all(data, wavelength_input, wavelength_increment_input, g_data_dim, wavelength) # Step 8: Spline interpolation of test spectra. INPUTS ALSO MAY NOT BE CORRECT
-  # Step 9: Generate smile corrected spectra for each pixel.
-  smile_correction(spectra_rad, min_spectral_angle, test_spectral_response, g_num_of_bands, g_shift_increment, wavelength)
+    print("Quantification complete, no issues.")
 
-  # The function runs through from beginning to end. Whether it's functional is yet to be seen.
+    # # # Correction
+    # Step 7: Apply reverse of Quantified shifts to SRFs. DEPRECATED. STEP 7 IS NOW BUNDLED INTO STEP 9.
+    # reverse_shifted_SRFS = reverse_shift(data, demo_SRF, min_spectral_angle) 
+    spectra_wav, spectra_rad = spline_interpolation_all(data, wavelength_input, wavelength_increment_input, g_data_dim, wavelength) # Step 8: Spline interpolation of test spectra. INPUTS ALSO MAY NOT BE CORRECT
+    # Step 9: Generate smile corrected spectra for each pixel.
+    corrected_datacube = smile_correction(spectra_rad, min_spectral_angle, test_spectral_response, g_num_of_bands, g_shift_increment, wavelength)
+
+    print("Correction complete, no issues.")
+
+    # # # Save the corrected data to data/TempData
+    folder_path = 'data/TempData/'
+    np.save(f'{folder_path}column_averaged_spectra.npy', column_averaged_spectra)
+    np.save(f'{folder_path}demo_SRF.npy', demo_SRF)
+    np.save(f'{folder_path}ref_and_test_spectra.npy', [ref_spectra, test_spectra])
+    np.save(f'{folder_path}sa_deg.npy', sa_deg)
+    np.save(f'{folder_path}min_spectral_angle.npy', min_spectral_angle)
+
+    np.save(f'{folder_path}spline_interpolated.npy', [spectra_wav, spectra_rad])
+    np.save(f'{folder_path}corrected_datacube.npy', corrected_datacube)
+
+    print("Data saved to data/TempData")
+
+    # The function runs through from beginning to end. Whether it's functional is yet to be seen.
