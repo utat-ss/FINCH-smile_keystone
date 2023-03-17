@@ -6,7 +6,7 @@
 #    on the global scope, which is bad practice).
 
 # main is operational; but there's a *lot* we could be doing to make this cleaner. Todo. - Andy
-
+# TODO: (tentative) Print the time it takes to run each step in a .txt file. - Shuhan
 
 import numpy as np
 import load_datacube_npy
@@ -16,6 +16,11 @@ indian_pine_array_filepath = 'data\indian_pine_array.npy'
 indian_pine_array = np.load(indian_pine_array_filepath)
 indian_pine_wavelength_filepath = 'data\indian_pine_wavelength.txt'
 indian_pine_wavelength = np.load(indian_pine_array_filepath)
+
+# # MODTRAN data goes here
+# TODO: add MODTRAN data
+MODTRAN_data_filepath = None
+MODTRAN_data = None
 
 # # Global Vars
 wavelength_source, radianceData, g_data_dim, wavelength, wavelength_increment = load_datacube_npy.ldn(indian_pine_array_filepath, indian_pine_wavelength_filepath)
@@ -60,35 +65,43 @@ if __name__ == '__main__':
 
     # # # Quantification
     column_averaged_spectra = data_matrix_collapse(data) # Step 1: Generate Column Averaged Spectra.
+    print ("Step 1 Done, no issues.")
     demo_SRF = test_spectral_response # Step 2: Generate SRFs.
-    ref_spectra, test_spectra = create_ref_and_test_spectra((0,1000), column_averaged_spectra, demo_SRF, wavelength_input, g_num_of_bands, g_num_shifts_1D, g_shift_increment, wavelength_increment) # Step 3, 4: Generate Reference and Test spectra. (0,100) is also a placeholder TODO: Add MODTRAN to this function as the reference spectra.
-    sa_deg = spectral_angle_calculation(test_spectra, ref_spectra, g_data_dim) # Step 5: Calculate spectral angle from test and reference spectra.
+    print ("Step 2 Done, no issues.")
+    ref_spectra, test_spectra = create_ref_and_test_spectra(column_averaged_spectra, demo_SRF, wavelength_input, g_num_of_bands, g_num_shifts_1D, g_shift_increment, reference_spectra=MODTRAN_data) # Step 3, 4: Generate Reference and Test spectra. (0,100) is also a placeholder 
+    # TODO: Add MODTRAN to this function as the reference spectra.
+    print ("Step 3, 4 Done, no issues.")
+    sa_deg = spectral_angle_calculation(test_spectra[0], ref_spectra[0], g_data_dim) # Step 5: Calculate spectral angle from test and reference spectra.
+    print ("Step 5 Done, no issues.")
     min_spectral_angle = determine_min_sa(sa_deg, g_data_dim) # Step 6: Determine minimum spectral angle.
+    print ("Step 6 Done, no issues.")
 
     print("Quantification complete, no issues.")
 
     # # # Correction
     # Step 7: Apply reverse of Quantified shifts to SRFs. DEPRECATED. STEP 7 IS NOW BUNDLED INTO STEP 9.
     # reverse_shifted_SRFS = reverse_shift(data, demo_SRF, min_spectral_angle) 
-    spectra_wav, spectra_rad = spline_interpolation_all(data, wavelength_input, wavelength_increment_input, g_data_dim, wavelength) # Step 8: Spline interpolation of test spectra. INPUTS ALSO MAY NOT BE CORRECT
-    # Step 9: Generate smile corrected spectra for each pixel.
+    spectra_wav, spectra_rad = spline_interpolation_all(data, wavelength_input, wavelength_increment_input, g_data_dim, wavelength) # Step 8: Spline interpolation of test spectra. INPUTS ALSO MAY NOT BE CORRECT. TODO: Check if imputs are still not correct.
+    print("Step 8 Done, no issues.")
+    # Step 9: Generate smile corrected spectra for each pixel. (This turns out to be the most computationally expensive step.)
     corrected_datacube = smile_correction(spectra_rad, min_spectral_angle, test_spectral_response, g_num_of_bands, g_shift_increment, wavelength)
 
     print("Correction complete, no issues.")
 
     # # # Save the corrected data to data/TempData
     folder_path = 'data/TempData/'
-    np.save(f'{folder_path}Step1_column_averaged_spectra.npy', column_averaged_spectra)
-    np.save(f'{folder_path}Step2_demo_SRF.npy', demo_SRF)
-    np.save(f'{folder_path}Step3_4_ref_and_test_spectra.npy', [ref_spectra, test_spectra])
-    np.save(f'{folder_path}Step5_sa_deg.npy', sa_deg)
-    np.save(f'{folder_path}Step6_min_spectral_angle.npy', min_spectral_angle)
-
-    np.save(f'{folder_path}Step7_spline_interpolated.npy', [spectra_wav, spectra_rad])
-    np.save(f'{folder_path}Step8_corrected_datacube.npy', corrected_datacube)
+    # Quantification data
+    np.save(f'{folder_path}column_averaged_spectra.npy', column_averaged_spectra)
+    np.save(f'{folder_path}ref_and_test_spectra.npy', [ref_spectra, test_spectra])
+    np.save(f'{folder_path}sa_deg.npy', sa_deg)
+    np.save(f'{folder_path}min_spectral_angle.npy', min_spectral_angle)
+    # Correction data
+    np.save(f'{folder_path}spline_interpolated.npy', [spectra_wav, spectra_rad])
+    np.save(f'{folder_path}corrected_datacube.npy', corrected_datacube)
 
     print("Data saved to data/TempData")
 
+    # # # Clear all variables
     column_averaged_spectra = None
     demo_SRF = None
     [ref_spectra, test_spectra] = None, None
