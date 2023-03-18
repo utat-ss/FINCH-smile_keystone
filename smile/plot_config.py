@@ -60,7 +60,7 @@ def plot_column_average_spectra(save=True, row_to_plot = None):
         fig.savefig(f"{PlotFolder}ColumnAverageSpectra{row_text}.png")
 
 # create_ref_and_test_spectra
-def plot_resampled_ref_spectra(save=True, crop_range=None, to_be_plotted=None):
+def plot_resampled_ref_spectra(wl = wavelength, save=True, crop_range=None, to_be_plotted=None):
     """Plots resampled reference spectra along with the shifts.
     Args:
         save (bool): If True, saves the plot to the current directory.
@@ -74,9 +74,9 @@ def plot_resampled_ref_spectra(save=True, crop_range=None, to_be_plotted=None):
 
     if crop_range is not None:
         crop_start, crop_end = crop_range
-        band_length = int((max(wavelength) - min(wavelength)) / main.g_num_of_bands)
-        crop_band_start = crop_start * band_length # TODO: add this
-        crop_band_end = (crop_end + 1) * band_length
+        band_length = int((max(wl) - min(wl)) / main.g_num_of_bands)
+        crop_wl_start = crop_start * band_length
+        crop_wl_end = (crop_end + 1) * band_length
 
     # # Retrieve data
     input_data = np.load(f'{DataFolder}column_averaged_spectra.npz',mmap_mode='r')['cas']
@@ -88,10 +88,6 @@ def plot_resampled_ref_spectra(save=True, crop_range=None, to_be_plotted=None):
     reference_spectra, sensors_position_reference, srf_columns_reference = reference_
     test_spectra, sensors_position_test, srf_columns_test = test_
 
-    # # Crop data
-    # cropped_reference = [i[crop_start:crop_end] for i in reference_spectra]
-    # cropped_test = [i[crop_start:crop_end] for i in test_spectra]
-
     # # Plot data
     fig, reference_plot = plt.subplots(1, 1, figsize=(25, 7))
 
@@ -100,27 +96,41 @@ def plot_resampled_ref_spectra(save=True, crop_range=None, to_be_plotted=None):
 
     # Plot the original data
     if main.MODTRAN_data is None:
-        reference_plot.plot(wavelength, input_data[0], label='First Column as Reference Spectra')
+        if crop_range is not None:
+            wl = wl[crop_wl_start:crop_wl_end]
+            input_data = input_data[crop_wl_start:crop_wl_end]
+        reference_plot.plot(wl, input_data[0], label='First Column as Reference Spectra')
         ref_ = "\n Reference: first comlumn"
     else:
-        reference_plot.plot(wavelength, main.MODTRAN_data, label='RefSerence Spectra from MODTRAN')
+        ref_data = main.MODTRAN_data
+        if crop_range is not None:
+            wl = wl[crop_wl_start:crop_wl_end]
+            ref_data = input_data[crop_wl_start:crop_wl_end]
+        reference_plot.plot(wl, ref_data, label='RefSerence Spectra from MODTRAN')
 
     fig_title = 'empty'
 
     # Plot the results
     if to_be_plotted == 'reference':
-        sensors_positions = stretch_horizontal(sensors_position_reference[0], wavelength)
+        sensors_positions = stretch_horizontal(sensors_position_reference[0], wl)
         fig_title = f"Reference Spectra with {main.g_num_shifts_1D} Shifts"
         for i, ref_shift in enumerate(reference_spectra):
+            if crop_range is not None:
+                sensors_positions = sensors_positions[crop_start:crop_end]
+                ref_shift = ref_shift[crop_start:crop_end]
             reference_plot.scatter(sensors_positions, ref_shift, label=f'shift {shift_range[i]}')
-            reference_plot.plot(np.linspace(min(wavelength), max(wavelength), main.g_num_of_bands*100), srf_columns_reference[i])
+            reference_plot.plot(np.linspace(min(wl), max(wl), main.g_num_of_bands*100), srf_columns_reference[i])
+
     elif to_be_plotted < len(test_spectra):
         # print(np.shape(sensors_position_test[to_be_plotted][0]), np.shape(test_spectra[to_be_plotted][0]))
-        sensors_positions = stretch_horizontal(sensors_position_test[to_be_plotted][0], wavelength)
+        sensors_positions = stretch_horizontal(sensors_position_test[to_be_plotted][0], wl)
         reference_plot.scatter(sensors_positions, test_spectra[to_be_plotted][0], label=f'Test Spectra of Column {to_be_plotted}')
+        reference_plot.plot(np.linspace(min(wl), max(wl), main.g_num_of_bands*100), srf_columns_test[to_be_plotted][0], label=f'SRF of Column {to_be_plotted}') # TODO: Crop this
         fig_title = f"Test Spectra of Column {to_be_plotted}"
+
     elif to_be_plotted >= len(test_spectra):
         raise UserWarning(f"Error: to_be_plotted is {to_be_plotted}, which is greater than the number of columns in the test spectra ({len(test_spectra)}).")
+    
     elif to_be_plotted is None:
         raise UserWarning("Error: to_be_plotted is None. Please specify what to be plotted.")
     
@@ -163,6 +173,7 @@ def plot_spectral_angle(column_to_plot = None, save=True):
     if save:
         fig.savefig(f"{PlotFolder}SpectralAngle.png")
 
+
 # plot_column_average_spectra()
-# plot_resampled_ref_spectra(save=True, to_be_plotted=100)
+plot_resampled_ref_spectra(save=True, crop_range=(0, 20), to_be_plotted='reference')
 # plot_spectral_angle()
