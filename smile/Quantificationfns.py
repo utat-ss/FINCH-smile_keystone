@@ -122,9 +122,9 @@ def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response
         reference_spectra: spot for an external reference data column. Without user input, the code automatically sources a data column from the data cube.
 
     Outputs:
-        cropped_sampled_reference: cropped resampled reference spectra, which was originally generated using the first colum. 
+        sampled_reference: cropped resampled reference spectra, which was originally generated using the first colum. 
             Its shape is (# of shifts, # of bands)
-        cropped_sampled_test: cropped resampled test spectra. Its shape is (# of columns, # of shifts, # of bands)
+        sampled_test: cropped resampled test spectra. Its shape is (# of columns, # of shifts, # of bands)
     """
     shift_bound = g_num_shifts_1D * g_shift_increment
     shift_range = (-shift_bound, shift_bound)
@@ -134,7 +134,7 @@ def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response
         ref_spectra = data_for_resampling[0]
 
     sampled_reference = run_resampling_spectra(ref_spectra, test_spectral_response, shift_range, g_num_of_bands, g_shift_increment, wavelength)
-    
+
     sampled_test = run_resampling_spectra(data_for_resampling, test_spectral_response, 0, g_num_of_bands, g_shift_increment, wavelength)
 
     if no_reference:
@@ -145,7 +145,7 @@ def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response
 # Author: Julia 
 # Step 5 of Smile. This fn computes the spectral angle from the test and reference spectra
 
-def spectral_angle_calculation(test_spectra, ref_spectra, g_data_dim, plot_col = -1, ):
+def spectral_angle_calculation(test_spectra, ref_spectra, g_data_dim, plot_col=-1):
     """ 
     Calculates the spectral angle
       
@@ -172,11 +172,11 @@ def spectral_angle_calculation(test_spectra, ref_spectra, g_data_dim, plot_col =
         plt.show()
         print("This is column ", plot_col)
         print(sa_deg[plot_col])
-      
+
     return sa_deg
 
 # Author: Rediet
-# Step 6 of Smile. This fn calculates the minimum spectral angle.  
+# Step 6 of Smile. This fn calculates the minimum spectral angle.
 def determine_min_sa(sa_deg, g_data_dim):
     """Calculates the minimum spectral angle
         Variables used: 
@@ -189,16 +189,16 @@ def determine_min_sa(sa_deg, g_data_dim):
     Returns: 
         min_col_num: A 1D matrix of size g_data_dim[2] containing the shifts of the best matched spectrum in sa_deg
     """
-    # Create a 1d array of size g_data_dim[2] containing the smallest value in each row of sa_deg (the spectral angle in degrees)
+    # Create a 1d array of size g_data_dim[2] conta`ining the smallest value in each row of sa_deg (the spectral angle in degrees)
     # Create another 1D array of size g_data_dim[2] containing the column number of the smallest value in each row
     min_each_row = np.zeros(g_data_dim[2])
     min_col_num = np.zeros(g_data_dim[2])
 
     for i in range(0, g_data_dim[2]):
         col = sa_deg[i]
-        #seaching each row for the minimum 
+        #seaching each row for the minimum
         min_each_row[i] = min(col)
         #finding the first occurance of the index of min_each_row[i]
-        min_col_num[i] = np.where(col == min_each_row[i])[0][0]  
-    
+        min_col_num[i] = np.where(col == min_each_row[i])[0][0]
+
         return min_col_num.astype(int)
