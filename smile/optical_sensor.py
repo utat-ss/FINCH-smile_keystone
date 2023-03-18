@@ -65,21 +65,6 @@ class optical_sensor:
         self.output = np.dot(self.raw_intensity, self.spectral_response)
         self.position = 0.5 * (self.x_left_bound + self.x_right_bound)
 
-
-def stretch_horizontal(to_be_stretched, target):
-    """
-    A linear transformation that stretches one array of any size, so it starts
-        and ends at the same points as the target array.
-
-    Args: 
-        to_be_stretched: the array that needs to be stretched
-        target: the array which length to_be_stretched needs to match
-
-    Outputs:
-        A 1D array, stretched input array
-    """
-    return np.array(to_be_stretched) * np.mean(np.diff(target)) + min(target)
-
 def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int, g_num_of_bands, g_shift_increment, wavelength, show_plots = False, show_progress = True):
     """
     One function that runs it all. If the SRF for each sensor is unique, compile
@@ -169,29 +154,38 @@ def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int,
             sensor_pos_shift.append(sensor_pos)
             srf_band_shift.append(srf_band)
 
+        sampled_spectra_shift = np.array(sampled_spectra_shift)
+        sensor_pos_shift = np.array(sensor_pos_shift)
+        srf_band_shift = np.array(srf_band_shift)
+
         sampled_spectra_columns.append(sampled_spectra_shift)
-        sensor_pos_columns.append(sensor_pos_shift) 
-        srf_columns.append(srf_band_shift) 
+        sensor_pos_columns.append(sensor_pos_shift)
+        srf_columns.append(srf_band_shift)
 
-    if show_plots:
-        if num_of_columns > 1:
-            print ("YouError: too many columns! This is on you.")
+    sampled_spectra_columns = np.array(sampled_spectra_columns)
+    sensor_pos_columns = np.array(sensor_pos_columns)
+    srf_columns = np.array(srf_columns)
 
-        else:
-            fig, plot_for_show = plt.subplots(1, 1, figsize=(15, 7))
+    # # Deprecated code for plotting
+    # if show_plots:
+    #     if num_of_columns > 1:
+    #         print ("YouError: too many columns! This is on you.")
 
-            plot_for_show.plot(wavelength, data_input, label = 'Input data')
-            plot_for_show.set_xlabel('Wavelength [nm]')
-            plot_for_show.set_ylabel('Radiance')
+    #     else:
+    #         fig, plot_for_show = plt.subplots(1, 1, figsize=(15, 7))
 
-            for i in range(len(sampled_spectra_shift)): 
-                plot_for_show.scatter(stretch_horizontal(sensor_pos_shift, wavelength), sampled_spectra_shift, label = f'Resampled band {i}')
-                plot_for_show.plot(np.linspace(min(wavelength), max(wavelength), np.shape(srf_band_shift)[1]), srf_band_shift[i])
+    #         plot_for_show.plot(wavelength, data_input, label = 'Input data')
+    #         plot_for_show.set_xlabel('Wavelength [nm]')
+    #         plot_for_show.set_ylabel('Radiance')
 
-            plot_for_show.legend()
-            fig.tight_layout()
+    #         for i in range(len(sampled_spectra_shift)): 
+    #             plot_for_show.scatter(stretch_horizontal(sensor_pos_shift, wavelength), sampled_spectra_shift, label = f'Resampled band {i}')
+    #             plot_for_show.plot(np.linspace(min(wavelength), max(wavelength), np.shape(srf_band_shift)[1]), srf_band_shift[i])
+
+    #         plot_for_show.legend()
+    #         fig.tight_layout()
 
     if num_of_columns == 1:
-        return sampled_spectra_shift, sensor_pos_shift, srf_band_shift
+        return sampled_spectra_shift, sensor_pos, srf_band_shift
 
-    return sampled_spectra_columns, sensor_pos_columns, srf_columns 
+    return sampled_spectra_columns, sensor_pos, srf_columns
