@@ -35,6 +35,7 @@ def stretch_horizontal(to_be_stretched, target):
     """
     return np.array(to_be_stretched) * np.mean(np.diff(target)) + min(target)
 
+
 # # Plotting Functions
 # column_average_spectra
 def plot_column_average_spectra(save=True, row_to_plot = None):
@@ -64,12 +65,13 @@ def plot_column_average_spectra(save=True, row_to_plot = None):
         fig.savefig(f"{PlotFolder}ColumnAverageSpectra{row_text}.png")
 
 # create_ref_and_test_spectra
-def plot_resampled_ref_spectra(wl = wavelength, save=True, crop_range=None, to_be_plotted=None):
+def plot_resampled_ref_and_test(wl = wavelength, to_be_plotted=None, crop_range=None, save=True):
     """Plots resampled reference spectra along with the shifts.
     Args:
-        save (bool): If True, saves the plot to the current directory.
+        wl (1D array): The wavelength array.
         crop_range (tuple): If specified, crops the plot to the specified range.
         to_be_plotted (str) or (int) or None: If input is 'refrence', plots the reference spectra. If input is any integer within the range of the number of columns, plots the test spectra of the specified column. If input is None, plots nothing.
+        save (bool): If True, saves the plot to PlotFolder.
     Returns:
         None
     """
@@ -87,7 +89,6 @@ def plot_resampled_ref_spectra(wl = wavelength, save=True, crop_range=None, to_b
     reference_and_test = np.load(f'{DataFolder}ref_and_test_spectra.npz', allow_pickle=True)
 
     # # Unpack data
-    # Reference_spectra = (num of shifts, num of bands)
     reference_, test_ = reference_and_test['ref'], reference_and_test['test']
     reference_spectra, sensors_position_reference, srf_columns_reference = reference_
     test_spectra, sensors_position_test, srf_columns_test = test_
@@ -110,11 +111,6 @@ def plot_resampled_ref_spectra(wl = wavelength, save=True, crop_range=None, to_b
 
         ref_data = main.MODTRAN_data
 
-        #if crop_range is None:
-        #    reference_plot.plot(wl, ref_data, label=spectra_name)
-        #else:
-        #    reference_plot.scatter(wl[crop_wl_start:crop_wl_end], ref_data[crop_wl_start:crop_wl_end], label=f"Reference Spectra ({spectra_name})")
-
     if crop_range is None:
         reference_plot.plot(wl, ref_data, label=spectra_name)
     else:
@@ -125,10 +121,10 @@ def plot_resampled_ref_spectra(wl = wavelength, save=True, crop_range=None, to_b
     # Plot the results
     if to_be_plotted == 'reference':
         sensors_positions = stretch_horizontal(sensors_position_reference[0], wl)
-        fig_title = f"Reference Spectra with {main.g_num_shifts_1D} Shifts"
+        fig_title = f"Reference Spectra with {2 * main.g_num_shifts_1D} Shifts"
         for i, ref_shift in enumerate(reference_spectra):
             # Determine the plot's range
-            sensors_positions_tmep = sensors_positions
+            sensors_positions_tmep = sensors_positions # TODO: sensors_positions_temp has no shape, but sensors_positions does. Find out why
             ref_shift_tmep = ref_shift
 
             SRF_x_tmep = np.linspace(min(wl), max(wl), main.g_num_of_bands*100)
@@ -146,10 +142,10 @@ def plot_resampled_ref_spectra(wl = wavelength, save=True, crop_range=None, to_b
                 # Plot the SRF
                 reference_plot.plot(SRF_x_tmep[crop_start * 100:crop_end * 100], srf_columns_reference_tmep[crop_start * 100:crop_end * 100], label = f"SRF with shift {round(shift_range[i], 2)}")
 
-    elif to_be_plotted < len(test_spectra):
+    elif to_be_plotted < len(test_spectra): # TODO: Edit this whole thing. Make sure it's up to date as the other sections.
         sensors_positions = stretch_horizontal(sensors_position_test[to_be_plotted][0], wl)
         reference_plot.scatter(sensors_positions, test_spectra[to_be_plotted][0], label=f'Test Spectra of Column {to_be_plotted}')
-        reference_plot.plot(np.linspace(min(wl), max(wl), main.g_num_of_bands*100), srf_columns_test[to_be_plotted][0], label=f'SRF of Column {to_be_plotted}') # TODO: Crop this
+        reference_plot.plot(np.linspace(min(wl), max(wl), main.g_num_of_bands*100), srf_columns_test[to_be_plotted][0], label=f'SRF of Column {to_be_plotted}')
         fig_title = f"Test Spectra of Column {to_be_plotted}"
 
     elif to_be_plotted >= len(test_spectra):
@@ -163,15 +159,15 @@ def plot_resampled_ref_spectra(wl = wavelength, save=True, crop_range=None, to_b
     fig.tight_layout()
 
     if save:
-        fig.savefig(f"{PlotFolder}RefAndTestSpectra.png")
+        fig.savefig(f"{PlotFolder}{fig_title}.png")
+
 
 # spectral angle calculation
-
 def plot_spectral_angle(column_to_plot = None, save=True):
     """Plots the spectral angle between the reference and test spectra.
     Args:
         column_to_plot (int): The column to plot the spectral angle of. If None, plots the all columns in the same figure.
-        save (bool): If True, saves the plot to the current directory.
+        save (bool): If True, saves the plot to PlotFolder.
     Returns:
         None
     """
@@ -199,27 +195,78 @@ def plot_spectral_angle(column_to_plot = None, save=True):
     if save:
         fig.savefig(f"{PlotFolder}SpectralAngle.png")
 
+# determine minimum spectral angle
+def plot_min_sa(save=True):
+    """Plots the minimum spectral angle for each column.
+    Args:
+        save (bool): If True, saves the plot to PlotFolder.
+    """
+    # Retrieve data
+    min_sa = np.load(f'{DataFolder}min_spectral_angle.npz', allow_pickle=True)['msa']
 
-def plot_corrected_datacube(slice_number = None, column_number = None, save=True):
-    """Plots the corrected datacube."""
+    # Plot data
+    fig, min_sa_plot = plt.subplots(1, 1, figsize=image_size)
+
+    min_sa_plot.plot(min_sa, label='Minimum Spectral Angle')
+    min_sa_plot.set_xlabel('Columns', fontsize = 15)
+    min_sa_plot.set_ylabel('Spectral Angle (deg)', fontsize = 15)
+    min_sa_plot.set_title("Minimum Spectral Angle of all Columns")
+
+    min_sa_plot.grid()
+    min_sa_plot.legend()
+    fig.tight_layout()
+
+    if save:
+        fig.savefig(f"{PlotFolder}Minimun Spectral Angles.png")
+
+# corrected datacube
+def plot_corrected_datacube(slice_number=None, spatial_coordinate=None, save=True):
+    """Plots the corrected datacube at a specific wavelength or spatial coordinate.
+    Args:
+        slice_number (int): The wavelength index to plot. If None, plots the datacube at a specific spatial coordinate.
+        spatial_coordinate (tuple): The spatial coordinate to plot. If None, plots the datacube at a specific wavelength. The coordinate is in the form (row, column).
+        save (bool): If True, saves the plot to PlotFolder.
+    Returns:
+        None
+    """
     # Retrieve data
     corrected_datacube = np.load(f'{DataFolder}corrected_datacube.npz', allow_pickle=True)['corrected_data']
 
     # Plot data
-    if slice_number is not None and column_number is None:
+    if slice_number is not None and spatial_coordinate is None:
+        # Plot the datacube at a specific wavelength
         fig, corrected_datacube_plot = plt.subplots(1, 1, figsize=image_size)
 
         corrected_datacube_plot.imshow(corrected_datacube[0])
         corrected_datacube_plot.set_xlabel('x [pixel]', fontsize = 15)
         corrected_datacube_plot.set_ylabel('y [pixel]', fontsize = 15)
         corrected_datacube_plot.set_title(f"Target's satellite image at {round(wavelength[slice_number], 2)}nm", fontsize=15)
-    
 
+    elif slice_number is None and spatial_coordinate is not None:
+        # Plot the corrected datacube at a specific spatial coordinate
+        corrected_wavelength = np.linspace(min(wavelength), max(wavelength), main.g_num_of_bands)
+
+        fig, corrected_datacube_plot = plt.subplots(1, 1, figsize=spectrum_size)
+
+        corrected_datacube_plot.plot(corrected_wavelength, corrected_datacube[:, spatial_coordinate[0], spatial_coordinate[1]])
+        corrected_datacube_plot.set_xlabel('Wavelength [nm]', fontsize = 15)
+        corrected_datacube_plot.set_ylabel('Reflectance', fontsize = 15)
+        corrected_datacube_plot.set_title(f"Corrected reflectance at ({spatial_coordinate[0]}px, {spatial_coordinate[1]}px)", fontsize=15)
+
+    # Error handling
+    elif slice_number is None and spatial_coordinate is None:
+        raise UserWarning("Error: slice_number and spatial_coordinate are both None. Please specify what to be plotted.")
+
+    elif slice_number is not None and spatial_coordinate is not None:
+        raise UserWarning("Error: can not plot both a slice and a spatial coordinate. Please specify what to be plotted.")
+
+    fig.tight_layout()
 
     if save:
         fig.savefig(f"{PlotFolder}CorrectedDatacube.png")
 
-plot_column_average_spectra()
-plot_resampled_ref_spectra(save=True, crop_range=(0, 10), to_be_plotted='reference')
-plot_spectral_angle()
-plot_corrected_datacube(5)
+#plot_column_average_spectra()
+#plot_resampled_ref_spectra(save=True, crop_range=(0, 10), to_be_plotted='reference')
+#plot_spectral_angle()
+plot_min_sa()
+#plot_corrected_datacube(0)

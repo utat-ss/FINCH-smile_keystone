@@ -1,6 +1,6 @@
 # # # Correction
 # Step 7: Apply reverse of Quantified shifts to SRFs. DEPRECATED. STEP 7 IS NOW BUNDLED INTO STEP 9.
-# reverse_shifted_SRFS = reverse_shift(data, demo_SRF, min_spectral_angle) 
+# reverse_shifted_SRFS = reverse_shift(data, demo_SRF, min_spectral_angle)
 # spectra_wav, spectra_rad = spline_interpolation_all(data, wavelength_input, wavelength_increment_input) # Step 8: Spline interpolation of test spectra. INPUTS ALSO MAY NOT BE CORRECT
 # Step 9: Generate smile corrected spectra for each pixel.
 # smile_correction(spectra_rad, min_spectral_angle, test_spectral_response)
@@ -73,7 +73,7 @@ def spline_interpolation_all(test_spectra_rad_all,test_spectra_wav, interp_step,
             new_test_spectra_rad_all: arrays containing the interpolated spectra radiance values for all pixels, shape = (??? TBD should be dependent on the step size, num of rows, num of cols)
 
     """
-    # getting the length of the array for interpolated wavelength and radiance values. This step is needed because we need to figure out the shape of the array before we do anything, 
+    # getting the length of the array for interpolated wavelength and radiance values. This step is needed because we need to figure out the shape of the array before we do anything,
     # the length of the interpolated values array is dependent on the step size and i can't figure it out lol
     dim_1 = np.shape(spline_interpolation_1_pixel(test_spectra_rad_all[:,1, 1], test_spectra_wav, interp_step, wavelength)[0])[0]
     # Creating zeros arrays to store the values of spiline interpolation for all pixels.
@@ -120,10 +120,10 @@ def smile_correction(interpolated_data, calculated_shift, srf, g_num_of_bands, g
         # Take out a slice of the interpolated data, such that all the data came from the same column. data_slice starts with shape (rows, spectral)
         clear_output(wait=True)
         print (f"Progress: {i}/{data_shape[2]}")
-        data_slice = np.transpose(interpolated_data[:, :, i]) 
+        data_slice = np.transpose(interpolated_data[:, :, i])
 
         output_temp = []
-        
+
         for count, row in enumerate(data_slice):
             # For each row, identify a shift constant and isolate a spectra from a colum
             shift_constant = calculated_shift[count]

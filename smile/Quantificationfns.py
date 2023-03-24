@@ -131,7 +131,7 @@ def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response
 
     if type(reference_spectra) is not np.array:
         no_reference = True
-        ref_spectra = data_for_resampling[0]
+        ref_spectra = data_for_resampling[80]
 
     sampled_reference = run_resampling_spectra(ref_spectra, test_spectral_response, shift_range, g_num_of_bands, g_shift_increment, wavelength)
 
