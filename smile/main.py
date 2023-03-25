@@ -19,8 +19,8 @@ indian_pine_wavelength = np.load(indian_pine_array_filepath)
 
 # # MODTRAN data goes here
 # TODO: add MODTRAN data
-MODTRAN_data_filepath = None
-MODTRAN_data = None
+Reference_data_filepath = None
+Reference_data = None
 
 # # Global Vars
 wavelength_source, radianceData, g_data_dim, wavelength, wavelength_increment = load_datacube_npy.ldn(indian_pine_array_filepath, indian_pine_wavelength_filepath)
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     print ("Step 2 Done, no issues.")
 
     # Step 3, 4: Generate Reference and Test spectra. (0,100) is also a placeholder
-    ref_spectra, test_spectra = create_ref_and_test_spectra(column_averaged_spectra, demo_SRF, wavelength_input, g_num_of_bands, g_num_shifts_1D, g_shift_increment, reference_spectra=MODTRAN_data)
+    ref_spectra, test_spectra = create_ref_and_test_spectra(column_averaged_spectra, demo_SRF, wavelength_input, g_num_of_bands, g_num_shifts_1D, g_shift_increment, reference_spectra=reference_data)
     # TODO: Add MODTRAN to this function as the reference spectra.
     print ("Step 3, 4 Done, no issues.")
     np.savez_compressed(f'{data_folder_path}ref_and_test_spectra', ref = ref_spectra, test = test_spectra)

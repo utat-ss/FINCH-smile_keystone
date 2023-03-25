@@ -1,5 +1,9 @@
 # Author: Shivesh Prakash
 # This file extracts an array of data from MODTRAN corresponding to a specific feature
+# TODO: separate the ploting part from the data extraction part. Make the data extraction part retun a 1D array. Keep the copied text from the website in a separate file.
+# TODO: The data extraction part should be a function with input being the raw data file's location.
+import numpy as np
+from matplotlib import pyplot as plt
 
 def extract_from_MODTRAN(json: dict, feature_wavelength: int, deeper_by=0, wider_by=0) -> np.array:
     """This function returns an array of data points corresposnding to the specific feature.
@@ -74,6 +78,5 @@ doc = {"56b32a2b-fe9c-4115-8c3f-c692609fd3e1":{"roots":{"references":[{"attribut
         ,"id":"51548","type":"Grid"},{"attributes":{},"id":"51549","type":"PanTool"},{"attributes":{"axis_label":"TRANSMITTANCE","formatter":{"id":"51574","type":"BasicTickFormatter"},"ticker":{"id":"51545","type":"BasicTicker"}}
         ,"id":"51544","type":"LinearAxis"},{"attributes":{},"id":"51545","type":"BasicTicker"},{"attributes":{"ticker":{"id":"51540","type":"BasicTicker"}},"id":"51543","type":"Grid"},{"attributes":{},"id":"51540","type":"BasicTicker"}
         ,{"attributes":{},"id":"51572","type":"BasicTickFormatter"}],"root_ids":["51530"]},"title":"Bokeh Application","version":"1.4.0"}}
-
 
 extract_from_MODTRAN(doc, 1450, deeper_by=0.1, wider_by=3)
