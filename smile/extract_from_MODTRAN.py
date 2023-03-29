@@ -59,11 +59,8 @@ def extract_from_MODTRAN(
             optimised_x.append(point)
     yp = np.array(optimised_y)
     xp = np.array(optimised_x)
-    datapoints = []
-    for i in range(len(xp)):
-        datapoints.append((xp[i], yp[i]))
 
-    return np.array(datapoints)
+    return xp, yp
 
 
 extract_from_MODTRAN("..data/MODTRANdata.json")
