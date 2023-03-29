@@ -66,4 +66,4 @@ def extract_from_MODTRAN(
     return np.array(datapoints)
 
 
-extract_from_MODTRAN("data.json")
+extract_from_MODTRAN("..data/MODTRANdata.json")
