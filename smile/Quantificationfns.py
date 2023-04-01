@@ -108,7 +108,7 @@ def make_random_SRFs(x, g_num_of_bands):
 
 # Author: Shuhan
 # Step 3 of Smile. This fn creates reference and test spectra from the provided data cube
-def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response, wavelength, g_num_of_bands, g_num_shifts_1D, g_shift_increment, reference_spectra = None):
+def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response, wavelength, g_num_of_bands, g_num_shifts_1D, g_shift_increment, ref_spectra = None):
     """
     Returns reference and test spectra. 
 
@@ -129,13 +129,15 @@ def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response
     shift_bound = g_num_shifts_1D * g_shift_increment
     shift_range = (-shift_bound, shift_bound)
 
-    if type(reference_spectra) is not np.array:
+    no_reference = False
+
+    if ref_spectra is None:
         no_reference = True
-        ref_spectra = data_for_resampling[80]
+        ref_spectra = data_for_resampling[0]
 
-    sampled_reference = run_resampling_spectra(ref_spectra, test_spectral_response, shift_range, g_num_of_bands, g_shift_increment, wavelength)
+    sampled_reference = run_resampling_spectra(ref_spectra, test_spectral_response, shift_range, g_num_of_bands, g_num_shifts_1D, wavelength)
 
-    sampled_test = run_resampling_spectra(data_for_resampling, test_spectral_response, 0, g_num_of_bands, g_shift_increment, wavelength)
+    sampled_test = run_resampling_spectra(data_for_resampling, test_spectral_response, 0, g_num_of_bands, g_num_shifts_1D, wavelength)
 
     if no_reference:
         print('Reference spectra not found, used first column by default.')
@@ -177,6 +179,7 @@ def spectral_angle_calculation(test_spectra, ref_spectra, g_data_dim, plot_col=-
 
 # Author: Rediet
 # Step 6 of Smile. This fn calculates the minimum spectral angle.
+# TODO: rename this to determine_min_sa_shift
 def determine_min_sa(sa_deg, g_data_dim):
     """Calculates the minimum spectral angle
         Variables used: 

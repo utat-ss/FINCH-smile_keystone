@@ -65,7 +65,7 @@ class optical_sensor:
         self.output = np.dot(self.raw_intensity, self.spectral_response)
         self.position = 0.5 * (self.x_left_bound + self.x_right_bound)
 
-def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int, g_num_of_bands, g_shift_increment, wavelength, show_plots = False, show_progress = True):
+def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int, g_num_of_bands, g_num_of_shifts_1D, wavelength, show_plots = False, show_progress = True):
     """
     One function that runs it all. If the SRF for each sensor is unique, compile
         them into a list in a low -> high wavelength order; if all sensors have 
@@ -106,7 +106,7 @@ def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int,
 
     if isinstance(shift_range, tuple):
         min_shift, max_shift = shift_range/wavelength_increment
-        shift_range = np.arange(min_shift, max_shift, g_shift_increment/wavelength_increment)
+        shift_range = np.linspace(min_shift, max_shift, g_num_of_shifts_1D)
 
     else:
         shift_range = [shift_range]

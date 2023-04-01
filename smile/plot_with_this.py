@@ -3,6 +3,9 @@
 
 from plot_config import *
 
+# Step 0: MODTRAN
+plot_MODTRAN_data()
+
 # Step 1: Generate the Column Averaged Spectra
 plot_column_average_spectra()
 
@@ -13,9 +16,9 @@ plot_resampled_ref_and_test(wavelength, to_be_plotted='reference')
 plot_resampled_ref_and_test(wavelength, to_be_plotted=10)
 
 # Step 5: Calculate Spectral Angle
-plot_spectral_angle(144) # TODO: fix the x axis
+plot_spectral_angle(20) # TODO: fix the x axis
 # NOTE: Investigate why the spectral angle is not a smile curve
-# Potential causes: 
+# Potential causes:
 # 1. the reference spectra is not correct (fix this by using MODTRAN)
 # 2. mathematical error with the spectral angle calculation
 

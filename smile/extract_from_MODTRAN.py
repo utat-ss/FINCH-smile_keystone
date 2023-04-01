@@ -61,6 +61,3 @@ def extract_from_MODTRAN(
     xp = np.array(optimised_x)
 
     return xp, yp
-
-
-extract_from_MODTRAN("..data/MODTRANdata.json")

@@ -38,6 +38,44 @@ def stretch_horizontal(to_be_stretched, target):
 
 # # Plotting Functions
 # 0. Plot MODTRAN data
+def plot_MODTRAN_data(crop_range = None, save=True):
+    """Plots MODTRAN data. By default, it plots the whole picture of the MODTRAN data. However, it can also plot a cropped version of the MODTRAN data if crop_range is specified.
+
+    Args:
+        crop_range (tuple): If specified, plots a cropped version of the MODTRAN data. The tuple should be in the form (min_wavelength, max_wavelength).
+        save (bool): If True, saves the plot to the current directory.
+    
+    Outputs:
+        A plot of the MODTRAN data.
+    """
+    MODTRAN_data = np.load(f'{DataFolder}MODTRAN_data.npz', mmap_mode='r')['MODTRAN_data']
+    MODTRAN_wavelength = np.load(f'{DataFolder}MODTRAN_data.npz', mmap_mode='r')['MODTRAN_wl']
+
+    fig, MODTRAN_plot = plt.subplots(1, 1, figsize=image_size)
+    MODTRAN_plot.set_xlabel('Wavelength (nm)', fontsize = 15)
+    MODTRAN_plot.set_ylabel('Radiance', fontsize = 15)
+    MODTRAN_plot.grid()
+
+    if crop_range is None:
+        MODTRAN_plot.plot(MODTRAN_wavelength, MODTRAN_data, label='MODTRAN Data')
+        MODTRAN_plot.set_title("Full MODTRAN Data", fontsize = 15)
+    else:
+        crop_start_index = np.argmin(np.abs(MODTRAN_wavelength - crop_range[0]))
+        crop_end_index = np.argmin(np.abs(MODTRAN_wavelength - crop_range[1]))
+
+        MODTRAN_plot.plot(MODTRAN_wavelength[crop_start_index:crop_end_index], MODTRAN_data[crop_start_index:crop_end_index], label='MODTRAN Data')
+
+        MODTRAN_plot.set_title(f"MODTRAN Data from {crop_range[0]} to {crop_range[1]} nm", fontsize = 15)
+
+    fig.tight_layout()
+    return_msg = ''
+    if save:
+        filename = f"{PlotFolder}ColumnAverageSpectra.png"
+        fig.savefig(filename)
+        return_msg += f"Saved image to {filename}"
+
+    print(f'MODTRAN data plotting done. {return_msg}')
+
 
 # 1. column_average_spectra
 def plot_column_average_spectra(save=True, row_to_plot = None):
@@ -107,15 +145,15 @@ def plot_resampled_ref_and_test(wl = wavelength, to_be_plotted=None, crop_range=
     reference_plot.grid()
 
     # Plot the original data
-    if main.MODTRAN_data is None:
+    if main.Reference_data is None:
         spectra_name = 'first column'
 
         ref_data = input_data[0]
-    
-    else:
-        spectra_name = 'MODTRAN'
 
-        ref_data = main.MODTRAN_data
+    else:
+        spectra_name = 'MODTRAN' # Artifact from using MODTRAN data.
+        wl = main.Reference_wl
+        ref_data = main.Reference_data
 
     if crop_range is None:
         reference_plot.plot(wl, ref_data, label=spectra_name)
@@ -212,6 +250,7 @@ def plot_spectral_angle(column_to_plot = None, save=True):
     print(f"spectral_angle plotting done. {return_msg}")
 
 # 4. determine minimum spectral angle
+# TODO: rename this to plot_min_sa_shifts, and every mention of min_sa
 def plot_min_sa(save=True):
     """Plots the minimum spectral angle for each column.
     Args:
@@ -223,9 +262,10 @@ def plot_min_sa(save=True):
     # Plot data
     fig, min_sa_plot = plt.subplots(1, 1, figsize=image_size)
 
-    min_sa_plot.plot(min_sa, label='Minimum Spectral Angle')
+    # TODO: fix the bandaid solution for the x-axis
+    min_sa_plot.plot(np.linspace(-5, 5, len(min_sa)), min_sa, label='Minimum Spectral Angle')
     min_sa_plot.set_xlabel('Columns', fontsize = 15)
-    min_sa_plot.set_ylabel('Spectral Angle (deg)', fontsize = 15)
+    min_sa_plot.set_ylabel('Shifts that minimize the spectral angle', fontsize = 15)
     min_sa_plot.set_title("Minimum Spectral Angle of all Columns")
 
     min_sa_plot.grid()
@@ -263,6 +303,8 @@ def plot_corrected_datacube(slice_number=None, spatial_coordinate=None, save=Tru
         corrected_datacube_plot.set_ylabel('y [pixel]', fontsize = 15)
         corrected_datacube_plot.set_title(f"Target's satellite image at {round(wavelength[slice_number], 2)}nm", fontsize=15)
 
+        location = f"{round(wavelength[slice_number], 2)}nm"
+
     elif slice_number is None and spatial_coordinate is not None:
         # Plot the corrected datacube at a specific spatial coordinate
         corrected_wavelength = np.linspace(min(wavelength), max(wavelength), main.g_num_of_bands)
@@ -274,6 +316,8 @@ def plot_corrected_datacube(slice_number=None, spatial_coordinate=None, save=Tru
         corrected_datacube_plot.set_ylabel('Reflectance', fontsize = 15)
         corrected_datacube_plot.set_title(f"Corrected reflectance at ({spatial_coordinate[0]}px, {spatial_coordinate[1]}px)", fontsize=15)
 
+        location = f"({spatial_coordinate[0]}px, {spatial_coordinate[1]}px)"
+
     # Error handling
     elif slice_number is None and spatial_coordinate is None:
         raise UserWarning("Error: slice_number and spatial_coordinate are both None. Please specify what to be plotted.")
@@ -283,7 +327,10 @@ def plot_corrected_datacube(slice_number=None, spatial_coordinate=None, save=Tru
 
     fig.tight_layout()
 
+    return_msg = ''
     if save:
-        fig.savefig(f"{PlotFolder}CorrectedDatacube.png")
+        filename = f"{PlotFolder}CorrectedDatacube{location}.png"
+        fig.savefig(filename)
+        return_msg = f"Saved image to {filename}"
 
-    print("corrected_datacube plotting done")
+    print(f"corrected_datacube plotting done. {return_msg}")
