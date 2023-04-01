@@ -37,7 +37,9 @@ def stretch_horizontal(to_be_stretched, target):
 
 
 # # Plotting Functions
-# column_average_spectra
+# 0. Plot MODTRAN data
+
+# 1. column_average_spectra
 def plot_column_average_spectra(save=True, row_to_plot = None):
     """Plots column average spectra. By default, it plots the whole picture of the 2D collapse result. However, it can also plot a single row of the 2D collapse result if plot_row is specified.
     Args: 
@@ -61,10 +63,14 @@ def plot_column_average_spectra(save=True, row_to_plot = None):
 
     ax.set_xlabel('Wavelength (nm)')
 
+    return_msg = ''
     if save:
-        fig.savefig(f"{PlotFolder}ColumnAverageSpectra{row_text}.png")
+        filename = f"{PlotFolder}ColumnAverageSpectra{row_text}.png"
+        fig.savefig(filename)
+        return_msg += f"Saved image to {filename}"
+    print(f'column_average_spectra plotting done. {return_msg}')
 
-# create_ref_and_test_spectra
+# 2. create_ref_and_test_spectra
 def plot_resampled_ref_and_test(wl = wavelength, to_be_plotted=None, crop_range=None, save=True):
     """Plots resampled reference spectra along with the shifts.
     Args:
@@ -73,7 +79,7 @@ def plot_resampled_ref_and_test(wl = wavelength, to_be_plotted=None, crop_range=
         to_be_plotted (str) or (int) or None: If input is 'refrence', plots the reference spectra. If input is any integer within the range of the number of columns, plots the test spectra of the specified column. If input is None, plots nothing.
         save (bool): If True, saves the plot to PlotFolder.
     Returns:
-        None
+        None§
     """
     shift_extent = main.g_num_shifts_1D * main.g_shift_increment
     shift_range = np.arange(-shift_extent, shift_extent, main.g_shift_increment)
@@ -120,33 +126,33 @@ def plot_resampled_ref_and_test(wl = wavelength, to_be_plotted=None, crop_range=
 
     # Plot the results
     if to_be_plotted == 'reference':
-        sensors_positions = stretch_horizontal(sensors_position_reference[0], wl)
-        fig_title = f"Reference Spectra with {2 * main.g_num_shifts_1D} Shifts"
+        sensors_positions = stretch_horizontal(sensors_position_reference, wl)
+        fig_title = f"ReferenceSpectra{2 * main.g_num_shifts_1D}Shifts"
+
         for i, ref_shift in enumerate(reference_spectra):
             # Determine the plot's range
-            sensors_positions_tmep = sensors_positions # TODO: sensors_positions_temp has no shape, but sensors_positions does. Find out why
-            ref_shift_tmep = ref_shift
-
-            SRF_x_tmep = np.linspace(min(wl), max(wl), main.g_num_of_bands*100)
-            srf_columns_reference_tmep = srf_columns_reference[i]
+            SRF_x = np.linspace(min(wl), max(wl), main.g_num_of_bands*100)
 
             if crop_range is None:
-                reference_plot.scatter(sensors_positions_tmep, ref_shift_tmep, label=f'shift {round(shift_range[i], 2)}')
+                reference_plot.scatter(sensors_positions, ref_shift, label=f'shift {round(shift_range[i], 2)}')
 
                 # Plot the SRF
-                reference_plot.plot(SRF_x_tmep, srf_columns_reference_tmep, label = f"SRF with shift {round(shift_range[i], 2)}")
-            
+                reference_plot.plot(SRF_x, srf_columns_reference[i], label = f"SRF with shift {round(shift_range[i], 2)}")
+
             else:
-                reference_plot.scatter(sensors_positions_tmep[crop_start:crop_end], ref_shift_tmep[crop_start:crop_end], label=f'shift {round(shift_range[i], 2)}')
+                reference_plot.scatter(sensors_positions[crop_start:crop_end], ref_shift[crop_start:crop_end], label=f'shift {round(shift_range[i], 2)}')
 
                 # Plot the SRF
-                reference_plot.plot(SRF_x_tmep[crop_start * 100:crop_end * 100], srf_columns_reference_tmep[crop_start * 100:crop_end * 100], label = f"SRF with shift {round(shift_range[i], 2)}")
+                reference_plot.plot(SRF_x[crop_start * 100:crop_end * 100], srf_columns_reference[i][crop_start * 100:crop_end * 100], label = f"SRF with shift {round(shift_range[i], 2)}")
 
     elif to_be_plotted < len(test_spectra): # TODO: Edit this whole thing. Make sure it's up to date as the other sections.
-        sensors_positions = stretch_horizontal(sensors_position_test[to_be_plotted][0], wl)
-        reference_plot.scatter(sensors_positions, test_spectra[to_be_plotted][0], label=f'Test Spectra of Column {to_be_plotted}')
-        reference_plot.plot(np.linspace(min(wl), max(wl), main.g_num_of_bands*100), srf_columns_test[to_be_plotted][0], label=f'SRF of Column {to_be_plotted}')
-        fig_title = f"Test Spectra of Column {to_be_plotted}"
+        sensors_positions = stretch_horizontal(sensors_position_test, wl)
+        fig_title = f"TestSpectraColumn {to_be_plotted}"
+
+        reference_plot.scatter(sensors_positions, test_spectra[to_be_plotted], label=f'Resampled test spectra of Column {to_be_plotted}')
+        SRF_x = np.linspace(min(wl), max(wl), main.g_num_of_bands*100)
+        reference_plot.plot(SRF_x, srf_columns_test[to_be_plotted][0], label=f'SRF of Column {to_be_plotted}')
+        
 
     elif to_be_plotted >= len(test_spectra):
         raise UserWarning(f"Error: to_be_plotted is {to_be_plotted}, which is greater than the number of columns in the test spectra ({len(test_spectra)}).")
@@ -158,11 +164,16 @@ def plot_resampled_ref_and_test(wl = wavelength, to_be_plotted=None, crop_range=
     reference_plot.set_title(fig_title + "\n Reference: " + spectra_name, fontsize = 15)
     fig.tight_layout()
 
+    return_msg = ''
     if save:
-        fig.savefig(f"{PlotFolder}{fig_title}.png")
+        filename = f"{PlotFolder}{fig_title}.png"
+        fig.savefig(filename)
+        return_msg = f"Saved image to {PlotFolder}{fig_title}.png"
+
+    print(f"resampled_ref_and_test plotting done. {return_msg}")
 
 
-# spectral angle calculation
+# 3. spectral angle calculation
 def plot_spectral_angle(column_to_plot = None, save=True):
     """Plots the spectral angle between the reference and test spectra.
     Args:
@@ -192,10 +203,15 @@ def plot_spectral_angle(column_to_plot = None, save=True):
     spectral_angle_plot.set_title(f"Spectral Angle of {columns}")
     spectral_angle_plot.grid()
 
+    return_msg = ''
     if save:
-        fig.savefig(f"{PlotFolder}SpectralAngle.png")
+        filename = f"{PlotFolder}SpectralAngle.png"
+        fig.savefig(filename)
+        return_msg = f"Saved image to {filename}"
 
-# determine minimum spectral angle
+    print(f"spectral_angle plotting done. {return_msg}")
+
+# 4. determine minimum spectral angle
 def plot_min_sa(save=True):
     """Plots the minimum spectral angle for each column.
     Args:
@@ -216,8 +232,13 @@ def plot_min_sa(save=True):
     min_sa_plot.legend()
     fig.tight_layout()
 
+    return_msg = ''
     if save:
-        fig.savefig(f"{PlotFolder}Minimun Spectral Angles.png")
+        filename = f"{PlotFolder}MinimunSpectralAngles.png"
+        fig.savefig(filename)
+        return_msg = f"Saved image to {filename}"
+
+    print(f"min_sa plotting done. {return_msg}")
 
 # corrected datacube
 def plot_corrected_datacube(slice_number=None, spatial_coordinate=None, save=True):
@@ -265,8 +286,4 @@ def plot_corrected_datacube(slice_number=None, spatial_coordinate=None, save=Tru
     if save:
         fig.savefig(f"{PlotFolder}CorrectedDatacube.png")
 
-#plot_column_average_spectra()
-#plot_resampled_ref_spectra(save=True, crop_range=(0, 10), to_be_plotted='reference')
-#plot_spectral_angle()
-plot_min_sa()
-#plot_corrected_datacube(0)
+    print("corrected_datacube plotting done")

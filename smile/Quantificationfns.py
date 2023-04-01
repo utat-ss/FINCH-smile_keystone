@@ -168,7 +168,7 @@ def spectral_angle_calculation(test_spectra, ref_spectra, g_data_dim, plot_col=-
     if plot_col == -1:
         pass
     else:
-        plt.plot(sa_deg[plot_col], marker='+',linestyle='None');
+        plt.plot(sa_deg[plot_col], marker='+',linestyle='None')
         plt.show()
         print("This is column ", plot_col)
         print(sa_deg[plot_col])

@@ -13,7 +13,14 @@ plot_resampled_ref_and_test(wavelength, to_be_plotted='reference')
 plot_resampled_ref_and_test(wavelength, to_be_plotted=10)
 
 # Step 5: Calculate Spectral Angle
-plot_spectral_angle()
+plot_spectral_angle(144) # TODO: fix the x axis
+# NOTE: Investigate why the spectral angle is not a smile curve
+# Potential causes: 
+# 1. the reference spectra is not correct (fix this by using MODTRAN)
+# 2. mathematical error with the spectral angle calculation
 
 # Step 6: Determine Minimum Spectral Angle
 plot_min_sa()
+
+# Final step: 
+plot_corrected_datacube(0)
