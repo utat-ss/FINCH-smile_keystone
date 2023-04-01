@@ -7,5 +7,8 @@
     "python.linting.pylintEnabled": false,
     "python.linting.enabled": false,
     "python.linting.prospectorEnabled": false,
-    "python.linting.mypyEnabled": true
+    "python.linting.mypyEnabled": true,
+    "[yaml]": {
+        "editor.tabSize": 4
+    }
 }
