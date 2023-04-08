@@ -251,7 +251,7 @@ def plot_spectral_angle(column_to_plot = None, save=True):
 
 # 4. determine minimum spectral angle
 # TODO: rename this to plot_min_sa_shifts, and every mention of min_sa
-def plot_min_sa(save=True):
+def plot_min_sa_shift(save=True):
     """Plots the minimum spectral angle for each column.
     Args:
         save (bool): If True, saves the plot to PlotFolder.

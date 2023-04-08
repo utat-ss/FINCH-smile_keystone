@@ -179,8 +179,7 @@ def spectral_angle_calculation(test_spectra, ref_spectra, g_data_dim, plot_col=-
 
 # Author: Rediet
 # Step 6 of Smile. This fn calculates the minimum spectral angle.
-# TODO: rename this to determine_min_sa_shift
-def determine_min_sa(sa_deg, g_data_dim):
+def determine_min_sa_shift(sa_deg, g_data_dim):
     """Calculates the minimum spectral angle
         Variables used: 
         min_each_row[g_data_dim[2]] holds the minimum value of each row in sa_deg (comparing between shifts for each column of the data)

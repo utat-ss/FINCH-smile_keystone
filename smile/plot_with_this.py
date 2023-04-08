@@ -23,7 +23,7 @@ plot_spectral_angle(20) # TODO: fix the x axis
 # 2. mathematical error with the spectral angle calculation
 
 # Step 6: Determine Minimum Spectral Angle
-plot_min_sa()
+plot_min_sa_shift()
 
 # Final step: 
 plot_corrected_datacube(0)

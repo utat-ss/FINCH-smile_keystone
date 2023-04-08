@@ -57,7 +57,7 @@ g_total_shifts = int(2*(g_num_shifts_1D/g_shift_increment)+1)
 # Function imports (DEPRECATED)
   # from create_ref_and_test_spectra import create_ref_and_test_spectra
   # from data_matrix_collapse import data_matrix_collapse
-  # from determine_min_sa import determine_min_sa
+  # from min_sa_shift import min_sa_shift
   # from load_datacube_npy import ldn
   # import optical_sensor
   # from spectral_angle_calculation import spectral_angle_calculation
@@ -101,7 +101,7 @@ if __name__ == '__main__':
     np.savez_compressed(f'{data_folder_path}sa_deg', sa_deg = sa_deg)
 
     # Step 6: Determine minimum spectral angle.
-    min_spectral_angle = determine_min_sa(sa_deg, g_data_dim)
+    min_spectral_angle = determine_min_sa_shift(sa_deg, g_data_dim)
     print ("Step 6 Done, no issues.")
     np.savez_compressed(f'{data_folder_path}min_spectral_angle', msa = min_spectral_angle)
 
