@@ -40,6 +40,9 @@ print("MODTRAN data loaded, no issues.")
 Reference_wl = MODTRAN_x
 Reference_data = MODTRAN_data
 
+# # Quantification feature range
+feature_range = None
+
 # # Global Vars
 wavelength_source, radianceData, g_data_dim, wavelength, wavelength_increment = load_datacube_npy.ldn(indian_pine_array_filepath, indian_pine_wavelength_filepath)
 
@@ -91,7 +94,7 @@ if __name__ == '__main__':
     print ("Step 2 Done, no issues.")
 
     # Step 3, 4: Generate Reference and Test spectra. (0,100) is also a placeholder
-    ref_spectra, test_spectra = create_ref_and_test_spectra(column_averaged_spectra, demo_SRF, wavelength_input, g_num_of_bands, g_num_shifts_1D, g_shift_increment, ref_spectra=Reference_data)
+    ref_spectra, test_spectra = create_ref_and_test_spectra(column_averaged_spectra, demo_SRF, wavelength_input, g_num_of_bands, g_num_shifts_1D, g_shift_increment, feature_range, ref_spectra=Reference_data)
     print ("Step 3, 4 Done, no issues.")
     np.savez_compressed(f'{data_folder_path}ref_and_test_spectra', ref = ref_spectra, test = test_spectra)
 
