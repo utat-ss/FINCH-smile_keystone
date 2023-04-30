@@ -7,7 +7,10 @@
 
 import numpy as np
 from matplotlib import pyplot as plt
-from IPython.display import clear_output
+
+from config import *
+
+#import main as main_smile
 class optical_sensor:
     """This class object is used to resample spectra. It is the core of Smile's spectra resampling algorithm, which is used in many places."""
     
@@ -30,7 +33,8 @@ class optical_sensor:
             self.spectral_response: the spectral response curve [1D array with 
                 length = # of sensors]
         """
-        g_num_of_bands = 70
+        num_of_bands = g_num_of_bands
+        # num_of_bands = 70
         #data_input = data_for_resampling[col_num]
 
         # from shorter wavelengths to longer wavelengths, assign each sensor 
@@ -44,7 +48,7 @@ class optical_sensor:
         # x_left_bound and x_right_bound are the given CCD's spectral range in terms of the indices of the raw data array.
         # x_left_bound and x_right_bound are the single sensor's spectral range.
         # For convenience's sake, they are in terms of indices of the raw data array (0 ~ N for len(data) == N)
-        sensor_width = len(data_input) / g_num_of_bands
+        sensor_width = len(data_input) / num_of_bands
 
         self.x_left_bound = int(sensor_number * sensor_width)
         self.x_right_bound = int((1 + sensor_number) * sensor_width)
@@ -114,7 +118,6 @@ def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int,
     for column in range(num_of_columns):
         # Run resampling for each column
         if show_progress:
-            clear_output(wait=True)
             print(f'Working through column {column}/{num_of_columns}')
 
         if num_of_columns > 1:

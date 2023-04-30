@@ -106,9 +106,29 @@ def make_random_SRFs(x, g_num_of_bands):
     # plt.plot(test_spectral_response(np.arange(0, 100)))
     # plt.plot(test_spectral_response(np.arange(0, 100) + 10))
 
+def get_feature_index(wavelength_source, feature_range):
+    """Finds the index of the feature range in the wavelength_source array.
+    
+    Args:
+        wavelength_source (array): array of wavelengths
+        feature_range (tuple): tuple of the start and end of the feature range in nm
+    
+    Returns:
+        feature_index (tuple): tuple of the start and end index of the feature range
+    """
+    feature_start, feature_end = feature_range
+
+    # np.linspace(min(wavelength_source), max(wavelength_source), len(optical_sensor.))
+    
+    start_index = np.where(abs(wavelength_source - feature_start) == min(abs(wavelength_source - feature_start)))[0][0]
+
+    end_index = np.where(abs(wavelength_source - feature_end) == min(abs(wavelength_source - feature_end)))[0][0]
+
+    return(start_index, end_index)
+
 # Author: Shuhan
 # Step 3 of Smile. This fn creates reference and test spectra from the provided data cube
-def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response, wavelength, g_num_of_bands, g_num_shifts_1D, g_shift_increment, feature_range = None, ref_spectra = None):
+def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response, wavelength, g_num_of_bands, g_num_shifts_1D, g_shift_increment, ref_spectra = None):
     """
     Returns reference and test spectra. 
 
@@ -119,7 +139,6 @@ def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response
         g_num_of_bands: global variable, number of bands;
         g_num_shifts_1D: global variable, number of shifts in 1D;
         g_shift_increment: global variable, shift increment;
-        feature_range: specifies the wavelength range of the atmospheric feature for calibration.
         reference_spectra: spot for an external reference data column. Without user input, the code automatically sources a data column from the data cube.
 
     Outputs:
@@ -127,7 +146,6 @@ def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response
             Its shape is (# of shifts, # of bands)
         sampled_test: cropped resampled test spectra. Its shape is (# of columns, # of shifts, # of bands)
     """
-    feature_start, feature_end = feature_range
 
     shift_bound = g_num_shifts_1D * g_shift_increment
     shift_range = (-shift_bound, shift_bound)
