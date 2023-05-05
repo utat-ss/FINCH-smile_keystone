@@ -5,6 +5,7 @@ from scipy import stats
 import matplotlib.pyplot as plt
 
 from optical_sensor import *
+import config
 
 # Author: Andy
 # Step 1 of Smile. Takes a 3-dimensional array of size a*b*c, and returns a 2-dimensional array of size b*c
@@ -66,6 +67,7 @@ def test_spectral_response(x):
     sigma = 0.25 * len(x)
     mu = 0.5 * len(x)
     gaussian = stats.norm.pdf(x, mu, sigma)
+    print(len(gaussian))
     normed_gaussian = gaussian / max(gaussian)
     
     return normed_gaussian
@@ -106,29 +108,9 @@ def make_random_SRFs(x, g_num_of_bands):
     # plt.plot(test_spectral_response(np.arange(0, 100)))
     # plt.plot(test_spectral_response(np.arange(0, 100) + 10))
 
-def get_feature_index(wavelength_source, feature_range):
-    """Finds the index of the feature range in the wavelength_source array.
-    
-    Args:
-        wavelength_source (array): array of wavelengths
-        feature_range (tuple): tuple of the start and end of the feature range in nm
-    
-    Returns:
-        feature_index (tuple): tuple of the start and end index of the feature range
-    """
-    feature_start, feature_end = feature_range
-
-    # np.linspace(min(wavelength_source), max(wavelength_source), len(optical_sensor.))
-    
-    start_index = np.where(abs(wavelength_source - feature_start) == min(abs(wavelength_source - feature_start)))[0][0]
-
-    end_index = np.where(abs(wavelength_source - feature_end) == min(abs(wavelength_source - feature_end)))[0][0]
-
-    return(start_index, end_index)
-
 # Author: Shuhan
 # Step 3 of Smile. This fn creates reference and test spectra from the provided data cube
-def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response, wavelength, g_num_of_bands, g_num_shifts_1D, g_shift_increment, ref_spectra = None):
+def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response, wavelength, ref_spectra = None):
     """
     Returns reference and test spectra. 
 
@@ -147,7 +129,7 @@ def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response
         sampled_test: cropped resampled test spectra. Its shape is (# of columns, # of shifts, # of bands)
     """
 
-    shift_bound = g_num_shifts_1D * g_shift_increment
+    shift_bound = config.g_num_shifts_1D * config.g_shift_increment
     shift_range = (-shift_bound, shift_bound)
 
     no_reference = False
@@ -155,10 +137,10 @@ def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response
     if ref_spectra is None:
         no_reference = True
         ref_spectra = data_for_resampling[0]
-
-    sampled_reference = run_resampling_spectra(ref_spectra, test_spectral_response, shift_range, g_num_of_bands, g_num_shifts_1D, wavelength)
-
-    sampled_test = run_resampling_spectra(data_for_resampling, test_spectral_response, 0, g_num_of_bands, g_num_shifts_1D, wavelength)
+    print(f"ref_spectra length: {len(ref_spectra)}")
+    sampled_reference = run_resampling_spectra(ref_spectra, test_spectral_response, shift_range, wavelength)
+    print(f"data_for_resampling length: {len(data_for_resampling)}")
+    sampled_test = run_resampling_spectra(data_for_resampling, test_spectral_response, 0, wavelength)
 
     if no_reference:
         print('Reference spectra not found, used first column by default.')

@@ -8,7 +8,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from config import *
+import config
 
 #import main as main_smile
 class optical_sensor:
@@ -33,7 +33,6 @@ class optical_sensor:
             self.spectral_response: the spectral response curve [1D array with 
                 length = # of sensors]
         """
-        num_of_bands = g_num_of_bands
         # num_of_bands = 70
         #data_input = data_for_resampling[col_num]
 
@@ -43,15 +42,21 @@ class optical_sensor:
         # each sensor may have a different SRF, or they may not. 
         # SRFs are mathematical expressions describing how sensors respond to 
         # photons landing on different parts of the sensor (refer to how hyperspecral cameras work)
+        print("mark")
         self.spectral_response_function = spectral_response_function1 #changed to 1 to avoid dupes
+        print("mark")
 
         # x_left_bound and x_right_bound are the given CCD's spectral range in terms of the indices of the raw data array.
         # x_left_bound and x_right_bound are the single sensor's spectral range.
         # For convenience's sake, they are in terms of indices of the raw data array (0 ~ N for len(data) == N)
-        sensor_width = len(data_input) / num_of_bands
+        sensor_width = int(len(config.wavelength_input) / config.num_of_bands)
 
         self.x_left_bound = int(sensor_number * sensor_width)
         self.x_right_bound = int((1 + sensor_number) * sensor_width)
+
+        # Overshoot control: if the right bound of the sensor is larger than the length of the raw data array, then set the right bound to the length of the raw data array
+        if self.x_right_bound > len(data_input):
+            self.x_right_bound = len(data_input)
         
         # An arbitrary x axis for the SRF, origin is seated on the left bound of the sensor in question, ends at the sensor's right bound
         x_axis = np.arange(0, self.x_right_bound - self.x_left_bound)
@@ -69,7 +74,7 @@ class optical_sensor:
         self.output = np.dot(self.raw_intensity, self.spectral_response)
         self.position = 0.5 * (self.x_left_bound + self.x_right_bound)
 
-def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int, g_num_of_bands, g_num_of_shifts_1D, wavelength, show_plots = False, show_progress = True):
+def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int, wavelength, show_progress = True):
     """
     One function that runs it all. If the SRF for each sensor is unique, compile
         them into a list in a low -> high wavelength order; if all sensors have 
@@ -109,8 +114,10 @@ def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int,
         num_of_columns = input_shape[0]
 
     if isinstance(shift_range, tuple):
-        min_shift, max_shift = shift_range/wavelength_increment
-        shift_range = np.linspace(min_shift, max_shift, g_num_of_shifts_1D)
+        # min_shift, max_shift = shift_range/wavelength_increment
+        min_shift = shift_range[0] / wavelength_increment
+        max_shift = shift_range[1] / wavelength_increment
+        shift_range = np.linspace(min_shift, max_shift, config.g_num_shifts_1D)
 
     else:
         shift_range = [shift_range]
@@ -137,7 +144,7 @@ def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int,
             sensor_pos = []
             srf_band_temp = []
 
-            for bands in range(g_num_of_bands):
+            for bands in range(config.num_of_bands):
                 if srf_input is list:
                     srf = srf_input[bands]
                 else:
@@ -145,6 +152,7 @@ def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int,
 
                 single_sensor = optical_sensor(data_temp, bands, srf, shift)
                 single_sensor.shift_constant = shift
+                print(f"Band {bands} is done.")
 
                 sampled_spectra.append(single_sensor.output)
                 sensor_pos.append(single_sensor.position)
