@@ -67,7 +67,6 @@ def test_spectral_response(x):
     sigma = 0.25 * len(x)
     mu = 0.5 * len(x)
     gaussian = stats.norm.pdf(x, mu, sigma)
-    print(len(gaussian))
     normed_gaussian = gaussian / max(gaussian)
     
     return normed_gaussian

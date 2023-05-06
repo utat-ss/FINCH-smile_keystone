@@ -25,7 +25,8 @@ import config
 
 # # Load indian pine array data
 indian_pine_array = np.load(config.indian_pine_array_filepath)
-indian_pine_wavelength = np.loadtxt(config.indian_pine_wavelength_filepath)
+# indian_pine_wavelength = np.loadtxt(config.indian_pine_wavelength_filepath)
+indian_pine_wavelength = np.linspace(400, 2500, 220)
 
 # # Load MODTRAN data
 from extract_from_MODTRAN import extract_from_MODTRAN

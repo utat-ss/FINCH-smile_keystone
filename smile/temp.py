@@ -4,6 +4,12 @@ DO NOT IMPORT THIS FILE INTO ANY OTHER FILES.
 """
 
 import config
+import test
 import numpy as np
+from matplotlib import pyplot as plt
 
-print(np.linspace(0, 5, 5+1))
+wavelength_index = [np.where(abs(config.wavelength_input - i) == min(abs(config.wavelength_input - i)))[0][0] for i in config.resampled_wavelength]
+
+output = [config.wavelength_input[i] for i in wavelength_index]
+
+print(output)
