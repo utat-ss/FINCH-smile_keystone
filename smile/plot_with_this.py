@@ -1,5 +1,7 @@
 # Author: Shuhan
 # One script to display the plots for a given coordinate in the datacube.
+# TODO: fix plot naming
+# TODO: Figure out wby spectral angle is still wrong.
 
 from plot_config import *
 
@@ -10,7 +12,6 @@ plot_MODTRAN_data()
 plot_column_average_spectra()
 
 # Step 2: Generate the SRFs (there is no need to plot this)
-
 # Step 3, 4: Generate Reference and Test Spectra
 plot_resampled_ref_and_test(wavelength, to_be_plotted='reference')
 plot_resampled_ref_and_test(wavelength, to_be_plotted=10)

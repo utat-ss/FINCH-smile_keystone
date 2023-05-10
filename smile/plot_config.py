@@ -4,6 +4,7 @@ import numpy as np
 
 from load_datacube_npy import ldn
 import main
+import config
 
 DataFolder = 'data/TempData/'
 PlotFolder = "data/SavedPlots/"
@@ -119,12 +120,12 @@ def plot_resampled_ref_and_test(wl = wavelength, to_be_plotted=None, crop_range=
     Returns:
         None§
     """
-    shift_extent = main.g_num_shifts_1D * main.g_shift_increment
-    shift_range = np.arange(-shift_extent, shift_extent, main.g_shift_increment)
+    shift_extent = config.g_num_shifts_1D * config.g_shift_increment
+    shift_range = np.arange(-shift_extent, shift_extent, config.g_shift_increment)
 
     if crop_range is not None:
         crop_start, crop_end = crop_range
-        band_length = round(len(wl) / main.g_num_of_bands)
+        band_length = round(len(wl) / config.g_num_of_bands)
         crop_wl_start = (crop_start * band_length)
         crop_wl_end = ((crop_end) * band_length)
 
@@ -165,11 +166,11 @@ def plot_resampled_ref_and_test(wl = wavelength, to_be_plotted=None, crop_range=
     # Plot the results
     if to_be_plotted == 'reference':
         sensors_positions = stretch_horizontal(sensors_position_reference, wl)
-        fig_title = f"ReferenceSpectra{2 * main.g_num_shifts_1D}Shifts"
+        fig_title = f"ReferenceSpectra{2 * config.g_num_shifts_1D}Shifts"
 
         for i, ref_shift in enumerate(reference_spectra):
             # Determine the plot's range
-            SRF_x = np.linspace(min(wl), max(wl), main.g_num_of_bands*100)
+            SRF_x = np.linspace(min(wl), max(wl), config.g_num_of_bands*100)
 
             if crop_range is None:
                 reference_plot.scatter(sensors_positions, ref_shift, label=f'shift {round(shift_range[i], 2)}')
@@ -188,7 +189,7 @@ def plot_resampled_ref_and_test(wl = wavelength, to_be_plotted=None, crop_range=
         fig_title = f"TestSpectraColumn {to_be_plotted}"
 
         reference_plot.scatter(sensors_positions, test_spectra[to_be_plotted], label=f'Resampled test spectra of Column {to_be_plotted}')
-        SRF_x = np.linspace(min(wl), max(wl), main.g_num_of_bands*100)
+        SRF_x = np.linspace(min(wl), max(wl), config.g_num_of_bands*100)
         reference_plot.plot(SRF_x, srf_columns_test[to_be_plotted][0], label=f'SRF of Column {to_be_plotted}')
         
 
@@ -306,7 +307,7 @@ def plot_corrected_datacube(slice_number=None, spatial_coordinate=None, save=Tru
 
     elif slice_number is None and spatial_coordinate is not None:
         # Plot the corrected datacube at a specific spatial coordinate
-        corrected_wavelength = np.linspace(min(wavelength), max(wavelength), main.g_num_of_bands)
+        corrected_wavelength = np.linspace(min(wavelength), max(wavelength), config.g_num_of_bands)
 
         fig, corrected_datacube_plot = plt.subplots(1, 1, figsize=spectrum_size)
 

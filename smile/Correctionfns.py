@@ -20,7 +20,6 @@ from optical_sensor import run_resampling_spectra
 # The original code also generates plots, but the plot-creating lines of code have been inhibited for now.
 # Call function spline_interpolation_all to utilize this file's codes.
 
-
 def spline_interpolation_1_pixel(test_spectra_rad, test_spectra_wav, interp_step, wavelength, make_plot=False):
 
     """ Generates spline interpolation of test spectral data
@@ -129,7 +128,7 @@ def smile_correction(interpolated_data, calculated_shift, srf, g_num_of_bands, g
             shift_constant = calculated_shift[count]
             isolated_spectra = row
 
-            corrected_spectra, _, _ = run_resampling_spectra(isolated_spectra, srf, shift_constant, g_num_of_bands, g_shift_increment, wavelength, show_progress=False)
+            corrected_spectra, _, _ = run_resampling_spectra(isolated_spectra, srf, shift_constant, wavelength, show_progress=False)
             output_temp.append(corrected_spectra[0])
 
         corrected_spectra_collection.append(output_temp)

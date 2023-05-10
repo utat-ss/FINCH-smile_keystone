@@ -28,14 +28,13 @@ class optical_sensor:
         self.name = f'sensor_{band_number}'
         self.spectral_response_function = spectral_response_function1
 
-        # NOTE: just use band_index to indicate the boudaries of each band
+        # Compute the band center, band width, and band wavelength
         self.left_index, self.right_index = config.band_index[band_number], config.band_index[band_number+1]
         self.band_wavelength = config.wavelength_input[self.left_index:self.right_index+1]
         self.band_width = self.band_wavelength[-1] - self.band_wavelength[0]
         self.band_center = (self.band_wavelength[-1] + self.band_wavelength[0])/2
 
         # Compute the statistical weights to assign via the spectral response function
-        # NOTE: this is the same for all sensors
         self.xpos = self.band_wavelength - self.band_center
         self.shift_constant = shift_constant
         self.spectral_response = self.spectral_response_function(self.xpos + self.shift_constant)
@@ -125,7 +124,6 @@ def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int,
 
                 single_sensor = optical_sensor(data_temp, bands, srf, shift)
                 single_sensor.shift_constant = shift
-                print(f"Band {bands} is done.")
 
                 sampled_spectra.append(single_sensor.output)
                 sensor_pos.append(single_sensor.band_center)

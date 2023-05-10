@@ -15,8 +15,8 @@ g_shift_increment = .2 #nanometers
 g_total_shifts = int(2*(g_num_shifts_1D/g_shift_increment)+1)
 
 # Feature range
-# feature = (1300, 1500) #nm
-feature = None
+feature = (1300, 1500) #nm
+# feature = None
 
 # Make the wavelength array, rather than using the provided .txt file.
 with open(indian_pine_wavelength_filepath, 'r') as f:
