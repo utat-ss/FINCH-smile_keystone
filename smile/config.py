@@ -47,7 +47,7 @@ def get_feature_index(wavelength_source, feature_range):
     return(start_index, end_index)
 
 # Resampled wavelength to create an array indicating the spectral boudnaries of each band
-band_bounds = np.round(np.linspace(min(wavelength), max(wavelength), g_num_of_bands+1), 2) # 
+band_bounds = np.round(np.linspace(min(wavelength), max(wavelength), g_num_of_bands+1), 2)
 
 if feature is not None:
     # wavelength indices covering the feature range

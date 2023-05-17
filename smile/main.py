@@ -10,18 +10,15 @@
 # TODO: (After project completion) Check each function's docstrings - Shuhan
 # TODO: Feed cropped MODTRAN and Indian Pine data into quantification, and feed quantified smile distortion and FULL indian pine data into correction. - Shuhan
 
-# Clear cache
-# import os
-# import shutil
-
-# shutil.rmtree(f'{config.data_folder_path}'[:-1])
-# os.mkdir(f'{config.data_folder_path}'[:-1])
 
 # Program starts here
 import numpy as np
-import load_datacube_npy
+import timeit
 
+import load_datacube_npy
 import config
+
+start = timeit.default_timer()
 
 # # Load indian pine array data
 indian_pine_array = np.load(config.indian_pine_array_filepath)
@@ -109,7 +106,7 @@ if __name__ == '__main__':
     print ("There is no step 7, because it was deprecated.")
 
     # Step 8: Spline interpolation of test spectra. INPUTS ALSO MAY NOT BE CORRECT. TODO: Check if imputs are still not correct.
-    spectra_wav, spectra_rad = spline_interpolation_all(data, wavelength_input, wavelength_increment_input, g_data_dim, wavelength)
+    spectra_wav, spectra_rad = spline_interpolation_all(data, wavelength, wavelength_increment_input, g_data_dim, wavelength)
     print("Step 8 Done, no issues.")
     np.savez_compressed(f'{config.data_folder_path}spline_interpolated', wav = spectra_wav, rad = spectra_rad)
 
@@ -128,3 +125,7 @@ if __name__ == '__main__':
     corrected_datacube = None
 
     # The function runs through from beginning to end. Whether it's functional is yet to be seen.
+
+end = timeit.default_timer()
+
+print(f"Total time taken: {end - start} seconds.")

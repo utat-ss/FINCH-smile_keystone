@@ -7,9 +7,8 @@ import config
 import test
 import numpy as np
 from matplotlib import pyplot as plt
+import main
 
-wavelength_index = [np.where(abs(config.wavelength_input - i) == min(abs(config.wavelength_input - i)))[0][0] for i in config.resampled_wavelength]
+min_spectral_angle = np.load(config.data_folder_path + "min_spectral_angle.npz")["msa"]
 
-output = [config.wavelength_input[i] for i in wavelength_index]
-
-print(output)
+print(np.shape(min_spectral_angle))
