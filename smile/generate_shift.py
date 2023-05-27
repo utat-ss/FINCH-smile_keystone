@@ -1,3 +1,7 @@
+# Author: Shivesh Prakash
+# This file contains a function to induce artificial SMILE distortions
+# Work in Progress, do not run yet
+
 import numpy as np
 import matplotlib.pyplot as plt
 
