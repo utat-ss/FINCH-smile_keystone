@@ -53,6 +53,7 @@ g_width_of_band = len(wavelength)/config.g_num_of_bands
     # from spline_interpolation import  spline_interpolation_1_pixel,   spline_interpolation_all
 
 #Function imports
+from GenerateSmileFns import *
 from Quantificationfns import *
 from Correctionfns import *
 
@@ -68,6 +69,9 @@ if __name__ == '__main__':
     # Globals further defined here in case we want to pass in other data
 
     # # # Quantification
+    # Step 0: Generate artificil SMILE shift in the radianceData
+    data = generate_smile_shift(data)
+
     # Step 1: Generate Column Averaged Spectra.
     column_averaged_spectra = data_matrix_collapse(data)
     print ("Step 1 Done, no issues.")
