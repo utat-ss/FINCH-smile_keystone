@@ -90,7 +90,7 @@ if __name__ == '__main__':
     
     ref_spectra, test_spectra = create_ref_and_test_spectra(column_averaged_spectra, demo_SRF, wavelength_input, ref_spectra=Reference_data)
     print ("Step 3, 4 Done, no issues.")
-    np.savez_compressed(f'{config.data_folder_path}ref_and_test_spectra', ref = ref_spectra, test = test_spectra)
+    
 
     # Step 5: Calculate spectral angle from test and reference spectra.
     sa_deg = spectral_angle_calculation(test_spectra[0], ref_spectra[0], g_data_dim)

@@ -136,10 +136,12 @@ def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response
     if ref_spectra is None:
         no_reference = True
         ref_spectra = data_for_resampling[0]
-    print(f"ref_spectra length: {len(ref_spectra)}")
-    sampled_reference = run_resampling_spectra(ref_spectra, test_spectral_response, shift_range, wavelength)
-    print(f"data_for_resampling length: {len(data_for_resampling)}")
-    sampled_test = run_resampling_spectra(data_for_resampling, test_spectral_response, 0, wavelength)
+
+    sampled_ref_spec, ref_pos, ref_srf = run_resampling_spectra(ref_spectra, test_spectral_response, shift_range, wavelength)
+    sampled_reference = {"spectra": sampled_ref_spec, "pos": ref_pos, "srf": ref_srf}
+
+    sampled_test_spec, test_pos, test_srf = run_resampling_spectra(data_for_resampling, test_spectral_response, 0, wavelength)
+    sampled_test = {"spectra": sampled_test_spec, "pos": test_pos, "srf": test_srf}
 
     if no_reference:
         print('Reference spectra not found, used first column by default.')
