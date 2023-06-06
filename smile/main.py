@@ -90,10 +90,23 @@ if __name__ == '__main__':
     demo_SRF = test_spectral_response
     print ("Step 2 Done, no issues.")
 
+<<<<<<< Updated upstream
     # Step 3, 4: Generate Reference and Test spectra. (0,100) is also a placeholder
     ref_spectra, test_spectra = create_ref_and_test_spectra(column_averaged_spectra, demo_SRF, wavelength_input, g_num_of_bands, g_num_shifts_1D, g_shift_increment, ref_spectra=Reference_data)
     print ("Step 3, 4 Done, no issues.")
     np.savez_compressed(f'{data_folder_path}ref_and_test_spectra', ref = ref_spectra, test = test_spectra)
+=======
+    # Step 3, 4: Generate Reference and Test spectra.
+    # But first, select only the section corresponding to the feature range.
+    if config.feature is not None:
+        feature_start, feature_end = config.get_feature_index(wavelength_input, config.feature)
+        column_averaged_spectra = column_averaged_spectra[:, feature_start:feature_end]
+        wavelength_input = wavelength_input[feature_start:feature_end]
+    
+    ref_spectra, test_spectra = create_ref_and_test_spectra(column_averaged_spectra, demo_SRF, wavelength_input, ref_spectra=Reference_data)
+    np.savez_compressed(f'{config.data_folder_path}ref_and_test_spectra', ref = ref_spectra, test = test_spectra)
+    print ("Step 3, 4 Done, no issues.")
+>>>>>>> Stashed changes
 
     # Step 5: Calculate spectral angle from test and reference spectra.
     sa_deg = spectral_angle_calculation(test_spectra[0], ref_spectra[0], g_data_dim)

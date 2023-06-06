@@ -122,9 +122,8 @@ def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response
         reference_spectra: spot for an external reference data column. Without user input, the code automatically sources a data column from the data cube.
 
     Outputs:
-        sampled_reference: cropped resampled reference spectra, which was originally generated using the first colum. 
-            Its shape is (# of shifts, # of bands)
-        sampled_test: cropped resampled test spectra. Its shape is (# of columns, # of shifts, # of bands)
+        sampled_reference: a dictionary containing the reference spectra, its position, and its spectral response function;
+        sampled_test: a dictionary containing the test spectra, its position, and its spectral response function.
     """
     shift_bound = g_num_shifts_1D * g_shift_increment
     shift_range = (-shift_bound, shift_bound)
@@ -135,9 +134,17 @@ def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response
         no_reference = True
         ref_spectra = data_for_resampling[0]
 
+<<<<<<< Updated upstream
     sampled_reference = run_resampling_spectra(ref_spectra, test_spectral_response, shift_range, g_num_of_bands, g_num_shifts_1D, wavelength)
 
     sampled_test = run_resampling_spectra(data_for_resampling, test_spectral_response, 0, g_num_of_bands, g_num_shifts_1D, wavelength)
+=======
+    sampled_ref_spec, ref_pos, ref_srf = run_resampling_spectra(ref_spectra, test_spectral_response, shift_range, wavelength)
+    sampled_reference = {"spectra": sampled_ref_spec, "pos": ref_pos, "srf": ref_srf}
+
+    sampled_test_spec, test_pos, test_srf = run_resampling_spectra(data_for_resampling, test_spectral_response, 0, wavelength)
+    sampled_test = {"spectra": sampled_test_spec, "pos": test_pos, "srf": test_srf}
+>>>>>>> Stashed changes
 
     if no_reference:
         print('Reference spectra not found, used first column by default.')
