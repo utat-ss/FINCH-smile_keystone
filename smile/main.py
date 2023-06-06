@@ -93,7 +93,7 @@ if __name__ == '__main__':
     
 
     # Step 5: Calculate spectral angle from test and reference spectra.
-    sa_deg = spectral_angle_calculation(test_spectra[0], ref_spectra[0], g_data_dim)
+    sa_deg = spectral_angle_calculation(test_spectra["spectra"], ref_spectra["spectra"], g_data_dim)
     print ("Step 5 Done, no issues.")
     np.savez_compressed(f'{config.data_folder_path}sa_deg', sa_deg = sa_deg)
 

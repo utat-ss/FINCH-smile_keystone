@@ -169,8 +169,17 @@ def spectral_angle_calculation(test_spectra, ref_spectra, g_data_dim, plot_col=-
     # calculating the SA angle in degrees
     sa_deg = np.zeros((g_data_dim[2],np.shape(ref_spectra)[0]))
     for num_of_col in range(g_data_dim[2]):
-        for num_of_shift in range(np.shape(ref_spectra)[0]):
-            sa_deg[num_of_col][num_of_shift] = np.degrees(np.arccos(np.dot(test_spectra[num_of_col][:],ref_spectra[num_of_shift][:])/(np.linalg.norm(test_spectra[num_of_col][:])*np.linalg.norm(ref_spectra[num_of_shift][:]))))
+        for num_of_shift, _ in enumerate (ref_spectra):
+            dot1 = test_spectra[num_of_col][:]
+            dot2 = ref_spectra[num_of_shift][:]
+
+            norm1 = np.linalg.norm(test_spectra[num_of_col][:])
+            norm2 = np.linalg.norm(ref_spectra[num_of_shift][:])
+
+            dot = np.dot(dot1/norm1, dot2/norm2)
+            sa_deg[num_of_col][num_of_shift] = np.degrees(np.arccos(dot))
+
+
     if plot_col == -1:
         pass
     else:
