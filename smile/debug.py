@@ -17,10 +17,6 @@ reference_and_test =np.load(f'{config.data_folder_path}ref_and_test_spectra.npz'
 # # Unpack data
 reference_, test_ = reference_and_test['ref'], reference_and_test['test']
 
-print(dir(reference_))
-print(reference_.item()["spectra"])
-
-
 
 sa_deg = main.spectral_angle_calculation(test_.item()["spectra"], reference_.item()['spectra'], g_data_dim)
 
