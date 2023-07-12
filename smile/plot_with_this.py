@@ -14,7 +14,7 @@ plot_column_average_spectra()
 # Step 2: Generate the SRFs (there is no need to plot this)
 # Step 3, 4: Generate Reference and Test Spectra
 plot_resampled_ref_and_test(wavelength, to_be_plotted='reference')
-plot_resampled_ref_and_test(wavelength, to_be_plotted=10)
+plot_resampled_ref_and_test(wavelength, to_be_plotted=10, crop_range=None, show_reference=True)
 
 # Step 5: Calculate Spectral Angle
 plot_spectral_angle() # TODO: fix the x axis

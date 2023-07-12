@@ -37,9 +37,7 @@ def get_feature_index(wavelength_source, feature_range):
     """
     feature_start, feature_end = feature_range
     
-    # start_index = np.where(abs(wavelength_source - feature_start) == min(abs(wavelength_source - feature_start)))[0][0]
-    # # end_index = np.where(abs(wavelength_source - feature_end) == min(abs(wavelength_source - feature_end)))[0][0]
-    # diff_start, diff_end = abs(wavelength_source - feature_start), abs(wavelength_source - feature_end)
+    # Find the index of desired values by finding the minimum difference
     diff_start, diff_end = [abs(i - feature_start) for i in wavelength_source], [abs(i - feature_end) for i in wavelength_source]
     start_index = diff_start.index(min(diff_start))
     end_index = diff_end.index(min(diff_end))

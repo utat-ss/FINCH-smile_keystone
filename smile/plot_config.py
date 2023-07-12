@@ -110,7 +110,7 @@ def plot_column_average_spectra(save=True, row_to_plot = None):
     print(f'column_average_spectra plotting done. {return_msg}')
 
 # 2. create_ref_and_test_spectra
-def plot_resampled_ref_and_test(wl = wavelength, to_be_plotted=None, crop_range=None, save=True):
+def plot_resampled_ref_and_test(wl = wavelength, to_be_plotted=None, crop_range=None, show_reference=False, save=True):
     """Plots resampled reference spectra along with the shifts.
     Args:
         wl (1D array): The wavelength array.
@@ -199,6 +199,14 @@ def plot_resampled_ref_and_test(wl = wavelength, to_be_plotted=None, crop_range=
     elif to_be_plotted is None:
         raise UserWarning("Error: to_be_plotted is None. Please specify what to be plotted.")
     
+    # If plot reference, make calibration overlays
+    if show_reference and config.feature is not None:
+        feature_start, feature_end = config.get_feature_index(main.Reference_wl, config.feature)
+        feature_wl = main.Reference_wl[feature_start:feature_end]
+        feature_data = main.Reference_data[feature_start:feature_end]
+
+        reference_plot.plot(feature_wl, feature_data, label='Feature for Reference', color = 'red')
+
     reference_plot.legend(bbox_to_anchor=(1, 1), loc='upper left')
     reference_plot.set_title(fig_title + "\n Reference: " + spectra_name, fontsize = 15)
     fig.tight_layout()
