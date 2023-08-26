@@ -64,48 +64,12 @@ def test_spectral_response(x):
     Output: 
         A Gaussian function corresponding to the inxpxut. A 1D array
     """
-    sigma = 0.25 * len(x)
-    mu = 0.5 * len(x)
+    sigma = x[int(0.25 * len(x))]
+    mu = x[int(0.5 * len(x))]
     gaussian = stats.norm.pdf(x, mu, sigma)
     normed_gaussian = gaussian / max(gaussian)
     
     return normed_gaussian
-
-def make_random_SRFs(x, g_num_of_bands):
-    """
-    Generates a list of unique and random Gaussian SRFs for each pixel. The parameters of each
-        generated Gaussian function is a random number between 0 and 1. These random numbers 
-        follow normal(Gaussian) distribution
-    Args:
-        x: a 1D array
-
-    Output: 
-        A list of Gaussian functions. Interact with them like this: 
-            func_list = make_random_SRFs
-            
-            test_SRF_1 = func_list[1](x's)
-            test_SRF_2 = func_list[2](x's)
-            ...
-    """
-    output = []
-    for i in range(g_num_of_bands):
-        sigma_temp = np.random.normal(loc = 0.5, scale = 0.1) * len(x)
-        mu_temp = np.random.normal(loc = 0.5, scale = 0.1) * len(x)
-
-        def temp (x):
-
-            gaussian = stats.norm.pdf(x, mu_temp, sigma_temp)
-            normed_gaussian = gaussian / max(gaussian)
-
-            return normed_gaussian
-          
-        globals()[f'random_SRF_{i}'] = temp
-    
-        output.append(globals()[f'random_SRF_{i}'])
-
-    return output
-    # plt.plot(test_spectral_response(np.arange(0, 100)))
-    # plt.plot(test_spectral_response(np.arange(0, 100) + 10))
 
 # Author: Shuhan
 # Step 3 of Smile. This fn creates reference and test spectra from the provided data cube
@@ -137,18 +101,25 @@ def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response
         no_reference = True
         ref_spectra = data_for_resampling[0]
 
-    sampled_ref_spec, ref_pos, ref_srf = run_resampling_spectra(ref_spectra, test_spectral_response, shift_range, wavelength)
+    if config.feature is tuple:
+        feature_start, feature_end = config.feature
+        ref_spectra = ref_spectra[:, feature_start:feature_end]
+        data_for_resampling = data_for_resampling[:, feature_start:feature_end]
+
+    sampled_ref_spec, ref_pos, ref_srf = run_resampling_spectra(ref_spectra,
+                                                                test_spectral_response,
+                                                                shift_range, wavelength)
     sampled_reference = {"spectra": sampled_ref_spec, "pos": ref_pos, "srf": ref_srf}
-
-    sampled_test_spec, test_pos, test_srf = run_resampling_spectra(data_for_resampling, test_spectral_response, 0, wavelength)
+    sampled_test_spec, test_pos, test_srf = run_resampling_spectra(data_for_resampling,
+                                                                   test_spectral_response,
+                                                                   0, wavelength)
     sampled_test = {"spectra": sampled_test_spec, "pos": test_pos, "srf": test_srf}
-
     if no_reference:
         print('Reference spectra not found, used first column by default.')
 
     return sampled_reference, sampled_test
 
-# Author: Julia 
+# Author: Julia
 # Step 5 of Smile. This fn computes the spectral angle from the test and reference spectra
 
 def spectral_angle_calculation(test_spectra, ref_spectra, g_data_dim, plot_col=-1):
@@ -178,7 +149,6 @@ def spectral_angle_calculation(test_spectra, ref_spectra, g_data_dim, plot_col=-
 
             dot = np.dot(dot1/norm1, dot2/norm2)
             sa_deg[num_of_col][num_of_shift] = np.degrees(np.arccos(dot))
-
 
     if plot_col == -1:
         pass

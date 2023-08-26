@@ -29,24 +29,35 @@ class optical_sensor:
         self.spectral_response_function = spectral_response_function1
 
         # Compute the band center, band width, and band wavelength
-        self.left_index, self.right_index = config.band_index[band_number], config.band_index[band_number+1]
-        self.band_wavelength = config.wavelength_input[self.left_index:self.right_index+1]
-        self.band_width = self.band_wavelength[-1] - self.band_wavelength[0]
-        self.band_center = (self.band_wavelength[-1] + self.band_wavelength[0])/2
+        self.left_index = config.band_index[band_number]
+        self.right_index = config.band_index[band_number+1]
+        self.band_wavelength = config.wavelength_input[self.left_index:self.right_index]
+        band_width = self.band_wavelength[-1] - self.band_wavelength[0]
+        self.band_center = (band_width)/2
+
+        # Compute the resampled spectra
+        self.intensity = data_input[self.left_index:self.right_index]
 
         # Compute the statistical weights to assign via the spectral response function
         self.xpos = self.band_wavelength - self.band_center
         self.shift_constant = shift_constant
         self.spectral_response = self.spectral_response_function(self.xpos + self.shift_constant)
-        
-        # Compute the resampled spectra
-        self.intensity = data_input[self.left_index:self.right_index+1]
-        self.output = np.dot(self.intensity, self.spectral_response)
+
+        # print(np.shape(self.intensity), np.shape(self.band_wavelength))
+        # print(self.intensity, self.band_wavelength)
+
+        try:
+            self.output = np.dot(self.intensity, self.spectral_response)
+        except ValueError:
+            print(self.intensity, self.spectral_response, self.xpos, self.band_wavelength)
 
         # Generate a concatenated spectral response curve
-        self.spectral_response_demo = self.spectral_response_function(np.linspace(min(self.xpos), max(self.xpos), 100) + self.shift_constant)
+        self.sr_demo = self.spectral_response_function(np.linspace(min(self.xpos),
+                                                                   max(self.xpos),
+                                                                   100) + self.shift_constant)
 
-def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int, wavelength, show_progress = True):
+def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int, wavelength,
+                           show_progress = True):
     """
     One function that runs it all. If the SRF for each sensor is unique, compile
         them into a list in a low -> high wavelength order; if all sensors have 
@@ -89,7 +100,8 @@ def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int,
         # min_shift, max_shift = shift_range/wavelength_increment
         min_shift = shift_range[0] / wavelength_increment
         max_shift = shift_range[1] / wavelength_increment
-        shift_range = np.linspace(min_shift, max_shift, config.g_num_shifts_1D)
+        shift_range = np.linspace(min_shift, max_shift, config.g_num_shifts_1D*2+1)
+        # shift_range = np.linspace(min_shift, max_shift, config.g_num_shifts_1D)
 
     else:
         shift_range = [shift_range]
@@ -122,14 +134,17 @@ def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int,
                 else:
                     srf = srf_input
 
-                single_sensor = optical_sensor(data_temp, bands, srf, shift)
+                try:
+                    single_sensor = optical_sensor(data_temp, bands, srf, shift)
+                except IndexError:
+                    break
                 single_sensor.shift_constant = shift
 
                 sampled_spectra.append(single_sensor.output)
                 sensor_pos.append(single_sensor.band_center)
 
                 # srf_band_temp.append(single_sensor.spectral_response_function(x_for_demo))
-                srf_band_temp.append(single_sensor.spectral_response_demo)
+                srf_band_temp.append(single_sensor.sr_demo)
                 srf_band = np.concatenate(srf_band_temp)
 
             sampled_spectra_shift.append(sampled_spectra)

@@ -2,13 +2,17 @@
 
 DO NOT IMPORT THIS FILE INTO ANY OTHER FILES.
 """
-
-import config
-import test
-import numpy as np
 from matplotlib import pyplot as plt
-import main
+import numpy as np
 
-min_spectral_angle = np.load(config.data_folder_path + "min_spectral_angle.npz")["msa"]
+test = np.zeros((200, 145, 145))
 
-print(np.shape(min_spectral_angle))
+for i in range(np.shape(test)[2]):
+    data_slice = np.transpose(test[:, :, i])
+    print(np.shape(data_slice))
+
+    for j, row in enumerate(data_slice):
+        print(np.shape(row))
+        break
+    break
+
