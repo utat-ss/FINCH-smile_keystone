@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
     # # # Quantification
     # Step 0: Generate artificil SMILE shift in the radianceData
-    # data = generate_smile_shift(data)
+    data = generate_smile_shift(data)
     print ("Step 0 Done, no issues.")
 
     # Step 1: Generate Column Averaged Spectra.
@@ -102,6 +102,7 @@ if __name__ == '__main__':
 
     # Step 6: Determine minimum spectral angle.
     min_spectral_angle = determine_min_sa_shift(sa_deg, g_data_dim)
+    print(min_spectral_angle)
     print ("Step 6 Done, no issues.")
     np.savez_compressed(f'{data_folder_path}min_spectral_angle', msa = min_spectral_angle)
 

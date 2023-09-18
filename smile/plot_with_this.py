@@ -10,7 +10,7 @@ from plot_config import *
 plot_MODTRAN_data()
 
 # Step 1: Generate the Column Averaged Spectra
-plot_column_average_spectra(row_to_plot=0)
+plot_column_average_spectra()
 
 # Step 2: Generate the SRFs (there is no need to plot this)
 # Step 3, 4: Generate Reference and Test Spectra
@@ -27,4 +27,4 @@ plot_spectral_angle(50) # TODO: fix the x axis
 plot_min_sa_shift()
 
 # Final step: 
-plot_corrected_datacube(0)
+plot_corrected_datacube(100)

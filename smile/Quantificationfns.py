@@ -109,10 +109,15 @@ def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response
     sampled_ref_spec, ref_pos, ref_srf = run_resampling_spectra(ref_spectra,
                                                                 test_spectral_response,
                                                                 shift_range, wavelength)
-    sampled_reference = {"spectra": sampled_ref_spec, "pos": ref_pos, "srf": ref_srf}
+    
     sampled_test_spec, test_pos, test_srf = run_resampling_spectra(data_for_resampling,
                                                                    test_spectral_response,
                                                                    0, wavelength)
+    
+    # TODO: normalzie one spectra to the other
+    
+    
+    sampled_reference = {"spectra": sampled_ref_spec, "pos": ref_pos, "srf": ref_srf}
     sampled_test = {"spectra": sampled_test_spec, "pos": test_pos, "srf": test_srf}
     if no_reference:
         print('Reference spectra not found, used first column by default.')
@@ -125,7 +130,7 @@ def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response
 def spectral_angle_calculation(test_spectra, ref_spectra, g_data_dim, plot_col=-1):
     """ 
     Calculates the spectral angle
-      
+    
     Arguments:
     test_spectra: shape = (number of columns, number of cropped bands). This array represents the collection of the dot products 
     of response functions and hyperspectral image data. 
@@ -146,8 +151,8 @@ def spectral_angle_calculation(test_spectra, ref_spectra, g_data_dim, plot_col=-
 
             norm1 = np.linalg.norm(test_spectra[num_of_col][:])
             norm2 = np.linalg.norm(ref_spectra[num_of_shift][:])
-
-            dot = np.dot(dot1/norm1, dot2/norm2)
+ 
+            dot = np.dot(dot1, dot2) / (norm1 * norm2)
             sa_deg[num_of_col][num_of_shift] = np.degrees(np.arccos(dot))
 
     if plot_col == -1:

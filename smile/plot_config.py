@@ -263,8 +263,8 @@ def plot_min_sa_shift(save=True):
     # Plot data
     fig, min_sa_plot = plt.subplots(1, 1, figsize=image_size)
 
-    # TODO: fix the bandaid solution for the x-axis
-    min_sa_plot.plot(np.linspace(-5, 5, len(min_sa)), min_sa, label='Minimum Spectral Angle')
+    # TODO: fix the hard code
+    min_sa_plot.plot(min_sa, label='Minimum Spectral Angle')
     min_sa_plot.set_xlabel('Columns', fontsize = 15)
     min_sa_plot.set_ylabel('Shifts that minimize the spectral angle', fontsize = 15)
     min_sa_plot.set_title("Minimum Spectral Angle of all Columns")

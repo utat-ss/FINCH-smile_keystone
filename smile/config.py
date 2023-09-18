@@ -12,7 +12,7 @@ Reference_data_filepath = "data/MODTRANdata.json"
 # Global Vars
 g_num_of_bands = 70
 g_num_shifts_1D = 5
-g_shift_increment = .2 #nanometers
+g_shift_increment = 20 #nanometers
 g_total_shifts = int(2*(g_num_shifts_1D/g_shift_increment)+1)
 
 # Feature range
