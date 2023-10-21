@@ -1,0 +1,1 @@
+This folder contains scripts to resolve the Keystone distortion in hyper spectral imaging.
