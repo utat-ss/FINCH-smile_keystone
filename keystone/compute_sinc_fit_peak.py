@@ -4,22 +4,21 @@
 import numpy as np
 from scipy.optimize import curve_fit
 
-def compute_sinc_fit_peak(img, p):
+def compute_sinc_fit_peak(img1, img2):
     """
     Calculate the maximum amplitude of a fitted sinc function.
 
     Args:
-        img (np.ndarray): The input image as a 2D NumPy array.
-        p (float): The intended subpixel shift.
+        img1 (np.ndarray): The first input image as a 2D NumPy array.
+        img2 (np.ndarray): The second input image as a 2D NumPy array.
 
     Returns:
         float: The maximum amplitude of the fitted sinc function.
     """
-    x3 = keystone(img, p)
-    r = fourier_t(img, x3)
+    r = fourier_t(img1, img2)
     l = []
     
-    n = len(img)
+    n = len(img1)
     for i in range(n):
         y = [r[j, i] for j in range(n)]
         l.append(np.mean(y))
