@@ -3,6 +3,7 @@
 
 import numpy as np
 from scipy.optimize import curve_fit
+from image_fourier_correlation import image_fourier_correlation
 
 def compute_sinc_fit_peak(img1, img2):
     """
@@ -15,7 +16,7 @@ def compute_sinc_fit_peak(img1, img2):
     Returns:
         float: The maximum amplitude of the fitted sinc function.
     """
-    r = fourier_t(img1, img2)
+    r = image_fourier_correlation(img1, img2)
     l = []
     
     n = len(img1)
