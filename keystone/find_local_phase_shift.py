@@ -1,5 +1,5 @@
-#Author: Shivesh Prakash
-#This file contains a function to compute the local phase shift between two images
+# Author: Shivesh Prakash
+# This file contains a function to compute the local phase shift between two images
 
 import numpy as np
 from image_fourier_correlation import image_fourier_correlation
