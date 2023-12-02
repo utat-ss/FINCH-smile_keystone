@@ -1,6 +1,8 @@
 # Author: Shivesh Prakash
 # This file inverts a polynomial regression model
 
+import numpy as np
+
 def invert_polynomial_regression(regression_model, value):
     """
     Use the polynomial regression model to predict list1 value from list2.
