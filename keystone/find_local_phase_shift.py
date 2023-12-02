@@ -1,6 +1,7 @@
 #Author: Shivesh Prakash
 
 import numpy as np
+from image_fourier_correlation import image_fourier_correlation
 
 def find_local_phase_shift(x1: np.ndarray, x3: np.ndarray) -> int:
     """
@@ -15,7 +16,7 @@ def find_local_phase_shift(x1: np.ndarray, x3: np.ndarray) -> int:
     """
 
     # Compute cross-correlation using Fourier Transform
-    r = fourier_t(x1, x3)
+    r = image_fourier_correlation(x1, x3)
 
     # Find the index of the maximum correlation value
     max_row, max_col = np.unravel_index(np.argmax(r), r.shape)
