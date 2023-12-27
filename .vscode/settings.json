@@ -10,5 +10,8 @@
     "python.linting.mypyEnabled": true,
     "[yaml]": {
         "editor.tabSize": 4
-    }
+    },
+    "githubPullRequests.ignoredPullRequestBranches": [
+        "main"
+    ]
 }
