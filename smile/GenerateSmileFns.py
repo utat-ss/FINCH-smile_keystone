@@ -18,7 +18,7 @@ def generate_shift_val(x, maxShift=2):
     Returns:
         float: The shift value
     """
-    a = -(maxShift / 6724)
+    a = -(maxShift / 672.4)
     b = 144 * maxShift / 6724
     c = 1540 * (maxShift / 6724)
     return (a * (x**2)) + (b * x) + c

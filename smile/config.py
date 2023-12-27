@@ -10,7 +10,6 @@ indian_pine_wavelength_filepath = 'data\indian_pine_wavelength.txt'
 Reference_data_filepath = "data/MODTRANdata.json"
 
 # Global Vars
-g_num_of_bands = 70
 g_num_shifts_1D = 5
 g_shift_increment = 20 #nanometers
 g_total_shifts = int(2*(g_num_shifts_1D/g_shift_increment)+1)
@@ -22,6 +21,8 @@ feature = (1300, 1500) #nm
 # Make the wavelength array, rather than using the provided .txt file.
 load_data = ldn(indian_pine_array_filepath, indian_pine_wavelength_filepath)
 wavelength_source, radianceData, g_data_dim, wavelength, wavelength_increment = load_data
+
+g_num_of_bands = g_data_dim[0]
 
 # Load other data
 indian_pine_array = np.load(indian_pine_array_filepath)

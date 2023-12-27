@@ -293,13 +293,16 @@ def plot_corrected_datacube(slice_number=None, spatial_coordinate=None, save=Tru
     """
     # Retrieve data
     corrected_datacube = np.load(f'{DataFolder}corrected_datacube.npz', allow_pickle=True)['corrected_data']
-
+    
     # Plot data
     if slice_number is not None and spatial_coordinate is None:
         # Plot the datacube at a specific wavelength
         fig, corrected_datacube_plot = plt.subplots(1, 1, figsize=image_size)
 
-        corrected_datacube_plot.imshow(corrected_datacube[0])
+        datacube_shape = np.shape(corrected_datacube)
+        img_center = (int(datacube_shape[1]/2), int(datacube_shape[2]/2))
+
+        corrected_datacube_plot.imshow(corrected_datacube[slice_number][0:-1][0:-10], vmin=0, vmax=corrected_datacube[0][img_center[0]][img_center[1]])
         corrected_datacube_plot.set_xlabel('x [pixel]', fontsize = 15)
         corrected_datacube_plot.set_ylabel('y [pixel]', fontsize = 15)
         corrected_datacube_plot.set_title(f"Target's satellite image at {round(wavelength[slice_number], 2)}nm", fontsize=15)
@@ -316,6 +319,7 @@ def plot_corrected_datacube(slice_number=None, spatial_coordinate=None, save=Tru
         corrected_datacube_plot.set_xlabel('Wavelength [nm]', fontsize = 15)
         corrected_datacube_plot.set_ylabel('Reflectance', fontsize = 15)
         corrected_datacube_plot.set_title(f"Corrected reflectance at ({spatial_coordinate[0]}px, {spatial_coordinate[1]}px)", fontsize=15)
+        fig.colorbar()
 
         location = f"({spatial_coordinate[0]}px, {spatial_coordinate[1]}px)"
 

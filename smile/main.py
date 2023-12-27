@@ -43,6 +43,7 @@ Reference_data = MODTRAN_data
 # The rest of the global variables are defined in py
 # wavelength_source, radianceData, g_data_dim, wavelength, wavelength_increment = load_datacube_npy.ldn(indian_pine_array_filepath, indian_pine_wavelength_filepath)
 
+# NOTE: this doesn't seem to be used anywhere.
 g_width_of_band = len(wavelength)/g_num_of_bands
 
 if feature is not None:
@@ -102,7 +103,7 @@ if __name__ == '__main__':
 
     # Step 6: Determine minimum spectral angle.
     min_spectral_angle = determine_min_sa_shift(sa_deg, g_data_dim)
-    print(min_spectral_angle)
+    print(min_spectral_angle, "at length = ", len(min_spectral_angle))
     print ("Step 6 Done, no issues.")
     np.savez_compressed(f'{data_folder_path}min_spectral_angle', msa = min_spectral_angle)
 

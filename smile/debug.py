@@ -4,15 +4,10 @@ DO NOT IMPORT THIS FILE INTO ANY OTHER FILES.
 """
 from matplotlib import pyplot as plt
 import numpy as np
+from Quantificationfns import test_spectral_response
 
-test = np.zeros((200, 145, 145))
+test = np.linspace(0, 10, 10)
 
-for i in range(np.shape(test)[2]):
-    data_slice = np.transpose(test[:, :, i])
-    print(np.shape(data_slice))
+print(np.argmax(test))
 
-    for j, row in enumerate(data_slice):
-        print(np.shape(row))
-        break
-    break
 

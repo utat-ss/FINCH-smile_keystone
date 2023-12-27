@@ -27,4 +27,4 @@ plot_spectral_angle(50) # TODO: fix the x axis
 plot_min_sa_shift()
 
 # Final step: 
-plot_corrected_datacube(100)
+plot_corrected_datacube(90)

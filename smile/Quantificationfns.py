@@ -53,7 +53,7 @@ def data_matrix_collapse(image_file):
 
 # Author: Shuhan
 # This fn contains mathematical functions that are currently placeholders for the sensor's spectral response functions. 
-def test_spectral_response(x):
+def test_spectral_response(x, mu = None):
     """
     A test spectral response function. Basically a Gaussian function centered 
         at mu * (max(x) - min(x)) with std = sigma
@@ -64,10 +64,15 @@ def test_spectral_response(x):
     Output: 
         A Gaussian function corresponding to the inxpxut. A 1D array
     """
-    sigma = x[int(0.25 * len(x))]
-    mu = x[int(0.5 * len(x))]
+    # sigma = x[int(0.25 * len(x))]
+    # mu = x[int(0.5 * len(x))]
+    sigma = x[int(0.01 * len(x))]
+
+    if mu is None:
+        mu = x[int(0.5 * len(x))]
+
     gaussian = stats.norm.pdf(x, mu, sigma)
-    normed_gaussian = gaussian / max(gaussian)
+    normed_gaussian = gaussian / sum(gaussian)
     
     return normed_gaussian
 
@@ -81,7 +86,6 @@ def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response
         data_for_resampling: the data that is being resampled and processed for SMILE correction;
         wavelength: a 1D array of wavelengths;
         test_spectral_response: a mathematical function simulating each pixel's spectral response;
-        g_num_of_bands: global variable, number of bands;
         g_num_shifts_1D: global variable, number of shifts in 1D;
         g_shift_increment: global variable, shift increment;
         reference_spectra: spot for an external reference data column. Without user input, the code automatically sources a data column from the data cube.
@@ -108,11 +112,13 @@ def create_ref_and_test_spectra(data_for_resampling:list, test_spectral_response
 
     sampled_ref_spec, ref_pos, ref_srf = run_resampling_spectra(ref_spectra,
                                                                 test_spectral_response,
-                                                                shift_range, wavelength)
+                                                                shift_range, wavelength,
+                                                                data_is_feature=True)
     
     sampled_test_spec, test_pos, test_srf = run_resampling_spectra(data_for_resampling,
                                                                    test_spectral_response,
-                                                                   0, wavelength)
+                                                                   0, wavelength,
+                                                                   data_is_feature=True)
     
     # TODO: normalzie one spectra to the other
     
@@ -181,14 +187,12 @@ def determine_min_sa_shift(sa_deg, g_data_dim):
     """
     # Create a 1d array of size g_data_dim[2] conta`ining the smallest value in each row of sa_deg (the spectral angle in degrees)
     # Create another 1D array of size g_data_dim[2] containing the column number of the smallest value in each row
-    min_each_row = np.zeros(g_data_dim[2])
     min_col_num = np.zeros(g_data_dim[2])
 
-    for i in range(0, g_data_dim[2]):
+    for i in range(g_data_dim[2]):
         col = sa_deg[i]
-        #seaching each row for the minimum
-        min_each_row[i] = min(col)
-        #finding the first occurance of the index of min_each_row[i]
-        min_col_num[i] = np.where(col == min_each_row[i])[0][0]
+        # finding the first occurance of the index of min_each_row[i]
+        # min_col_num[i] = np.where(col == min_row)[0][0]
+        min_col_num[i] = np.argmin(col)
 
-        return min_col_num.astype(int)
+    return min_col_num.astype(np.float16)

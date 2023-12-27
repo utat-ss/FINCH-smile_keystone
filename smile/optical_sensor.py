@@ -29,19 +29,23 @@ class optical_sensor:
         self.spectral_response_function = spectral_response_function1
 
         # Compute the band center, band width, and band wavelength
-        self.left_index = config.band_index[band_number]
-        self.right_index = config.band_index[band_number+1]
-        self.band_wavelength = config.wavelength_input[self.left_index:self.right_index]
-        band_width = self.band_wavelength[-1] - self.band_wavelength[0]
+        # self.left_index = config.band_index[band_number]
+        # self.right_index = config.band_index[band_number+1]
+        # self.band_wavelength = config.wavelength_input[self.left_index:self.right_index]
+        max_wl = config.wavelength_input[-1]
+        min_wl = config.wavelength_input[0]
+        self.band_wavelength = np.linspace(min_wl, max_wl, len(data_input))
+        # band_width = self.band_wavelength[-1] - self.band_wavelength[0]
+        band_width = len(data_input)
         self.band_center = (band_width)/2
 
         # Compute the resampled spectra
-        self.intensity = data_input[self.left_index:self.right_index]
+        self.intensity = data_input # [self.left_index:self.right_index]
 
         # Compute the statistical weights to assign via the spectral response function
         self.xpos = self.band_wavelength - self.band_center
         self.shift_constant = shift_constant
-        self.spectral_response = self.spectral_response_function(self.xpos + self.shift_constant)
+        self.spectral_response = self.spectral_response_function(self.xpos + self.shift_constant, self.band_center)
 
         # print(np.shape(self.intensity), np.shape(self.band_wavelength))
         # print(self.intensity, self.band_wavelength)
@@ -57,7 +61,7 @@ class optical_sensor:
                                                                    100) + self.shift_constant)
 
 def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int, wavelength,
-                           show_progress = True):
+                           show_progress = True, data_is_feature = False):
     """
     One function that runs it all. If the SRF for each sensor is unique, compile
         them into a list in a low -> high wavelength order; if all sensors have 
@@ -106,6 +110,12 @@ def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int,
     else:
         shift_range = [shift_range]
 
+    if data_is_feature:
+        num_of_bands = config.num_of_bands
+
+    else:
+        num_of_bands = config.g_num_of_bands
+
     for column in range(num_of_columns):
         # Run resampling for each column
         if show_progress:
@@ -128,7 +138,7 @@ def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int,
             sensor_pos = []
             srf_band_temp = []
 
-            for bands in range(config.num_of_bands):
+            for bands in range(num_of_bands):
                 if srf_input is list:
                     srf = srf_input[bands]
                 else:
