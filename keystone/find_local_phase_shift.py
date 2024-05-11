@@ -4,7 +4,7 @@
 import numpy as np
 from image_fourier_correlation import image_fourier_correlation
 
-def find_local_phase_shift(x1: np.ndarray, x3: np.ndarray) -> int:
+def find_local_phase_shift(x1: np.ndarray, x3: np.ndarray) -> float:
     """
     Calculates the local phase shift between two images along the x-axis using cross-correlation.
 
@@ -13,7 +13,7 @@ def find_local_phase_shift(x1: np.ndarray, x3: np.ndarray) -> int:
     - x3: np.ndarray - Input image 2
 
     Returns:
-    - int: The calculated x-shift representing the local phase shift between the images
+    - float: The calculated x-shift representing the local phase shift between the images
     """
 
     # Compute cross-correlation using Fourier Transform
@@ -26,4 +26,4 @@ def find_local_phase_shift(x1: np.ndarray, x3: np.ndarray) -> int:
     # Shift relative to the center of the cross-correlation result
     x_shift = max_col - (r.shape[1] // 2)
 
-    return int(x_shift)
+    return x_shift
