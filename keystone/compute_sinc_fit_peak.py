@@ -26,8 +26,8 @@ def compute_sinc_fit_peak(img1, img2):
     
     r3 = np.array(l)
     x = np.array([x for x in range(- (n // 2), n - (n // 2))])
-    popt, pcov = curve_fit(sincfit, x, r3)
+    popt, pcov = curve_fit(sinc_fit, x, r3)
     x2 = np.linspace(-10, 10, 500)
-    y2 = np.array([sincfit(x, popt[0], popt[1], popt[2]) for x in x2])
+    y2 = np.array([sinc_fit(x, popt[0], popt[1], popt[2]) for x in x2])
     
     return max(y2)
