@@ -2,6 +2,9 @@
 # This file contains the main function to correct a keystone distorted datacube
 
 import numpy as np
+from first_guess import first_guess
+from final_guess import final_guess
+from apply_keystone import apply_keystone
 
 
 def main(
