@@ -61,7 +61,7 @@ These metrics quantify the discrepancy between the real keystone shifts applied 
 
 The plot below illustrates the comparison between the real keystone shifts and the shifts calculated by the algorithm. It shows how closely the calculated shifts align with the true values across the range of spectral bands.
 
-![Real vs Calculated Shifts](keystone/real_vs_calculated_shifts.pdf)
+![Real vs Calculated Shifts](real_vs_calculated_shifts.pdf)
 
 ## Citation
 
