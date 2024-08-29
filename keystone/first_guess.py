@@ -9,6 +9,7 @@ from run_polynomial_regression import run_polynomial_regression
 from invert_polynomial_regression import invert_polynomial_regression
 from detect_sift_features import detect_sift_features
 
+
 def first_guess(radianceData, band_index, threshold=0.006):
     """
     Generates an initial estimate of the keystone subpixel shift between two adjacent bands in a hyperspectral image cube.
@@ -42,9 +43,12 @@ def first_guess(radianceData, band_index, threshold=0.006):
     )
 
     # Invert the regression model to estimate the keystone shift between the original bands.
-    estimated_pixel_shift = invert_polynomial_regression(
-        regression_model, compute_sinc_fit_peak(imgx, imgx1)
-    )
+    try:
+        estimated_pixel_shift = invert_polynomial_regression(
+            regression_model, compute_sinc_fit_peak(imgx, imgx1)
+        )
+    except IndexError:
+        estimated_pixel_shift = 0.003
 
     # Apply the estimated keystone shift to correct the next band.
     fixed_x1 = apply_keystone(imgx1, -estimated_pixel_shift)
@@ -57,19 +61,22 @@ def first_guess(radianceData, band_index, threshold=0.006):
         return estimated_phase_shift
 
     # Step 3: SIFT Method
-    # If the initial estimate is not within the threshold, use SIFT to refine the estimate.
-    points1, points2 = detect_sift_features(imgx, imgx1)
+    try:
+        # If the initial estimate is not within the threshold, use SIFT to refine the estimate.
+        points1, points2 = detect_sift_features(imgx, imgx1)
 
-    # Perform polynomial regression on the matched SIFT feature points to predict the keystone shift.
-    sift_regression_model = run_polynomial_regression(points1[:, 0], points2[:, 0])
+        # Perform polynomial regression on the matched SIFT feature points to predict the keystone shift.
+        sift_regression_model = run_polynomial_regression(points1[:, 0], points2[:, 0])
 
-    # Use the SIFT-based regression model to predict the pixel shift.
-    predicted_pixel_shift = sift_regression_model(0)
+        # Use the SIFT-based regression model to predict the pixel shift.
+        predicted_pixel_shift = sift_regression_model(0)
 
-    # Apply the predicted keystone shift to correct the next band.
-    sift_fixed_x1 = apply_keystone(imgx1, -predicted_pixel_shift)
+        # Apply the predicted keystone shift to correct the next band.
+        sift_fixed_x1 = apply_keystone(imgx1, -predicted_pixel_shift)
 
-    # Compute the phase shift between the original band and the SIFT-corrected band.
-    sift_estimated_phase_shift = compute_sinc_fit_peak(imgx, sift_fixed_x1)
+        # Compute the phase shift between the original band and the SIFT-corrected band.
+        sift_estimated_phase_shift = compute_sinc_fit_peak(imgx, sift_fixed_x1)
 
-    return sift_estimated_phase_shift
+        return sift_estimated_phase_shift
+    except IndexError:
+        return estimated_phase_shift
