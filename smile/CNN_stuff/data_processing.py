@@ -1,11 +1,12 @@
 import numpy as np
-import os 
-from PIL import Image
 import matplotlib.pyplot as plt 
+import plotly.express as px
+import pandas as pd
 
 # a seperate file named data_from which stores location of whatever dataset you want analyzed
-from data_from import indian_pine
+from data_from import indian_pine, indian_pine_wavelength_separation, spectral_monuments_min, spectral_monuments_max
 
+metadata = indian_pine_wavelength_separation
 
 # The data that is being analyzed (.npy file), and the file that the data will be written into 
 data = np.load(indian_pine)
@@ -34,9 +35,9 @@ def normalize_pixels(array_to_normalize: np.array, maximum_pixel: int):
             to_put = (array_to_normalize[number1][number2] / maximum_pixel) * 255
 
             normalized_array[number1][number2] = to_put
-            
+
             print(normalized_array[number1][number2])
-    
+
     return normalized_array
 
 # Specific band for a certain pixel
@@ -58,6 +59,8 @@ def pixel_information(result=[int, int]):
     # result[0] is the x component and result[1] is the y component
     return (data[result[0]][result[1]])
 
+# ----- Real Functions (this is the stuff that'll get used I think) ----- #
+
 def cook_a_line(wavelength:int, height: int):
     '''
     Gets you a graph for a line at a certain height at a certain wavelength. 
@@ -75,8 +78,6 @@ def cook_a_line(wavelength:int, height: int):
     for pixel_number in range(data_shape[1]):
         first = pixel_information([height, pixel_number])
         pixel_informations = pixel_wavelength_information([height, pixel_number, wavelength])
-        print(first)
-        print(pixel_informations)
         
         to_graph_array.append(pixel_informations)
         numbers.append(pixel_number)
@@ -117,30 +118,107 @@ def create_band_sheet(wavelength: int, selection: int):
     for number1 in range(0, data_shape[0]):
         for number2 in range(0, data_shape[1]):
                       
-            # Specifies the pixel you want the information for, and the band you want it from 
+            # Specifies the pixel you want the information for, and the band you want it from
             to_get = [number1, number2, wavelength]
             
-            # Passes above information into the pixel_wavelength_information, and it gets the (brilliance?) of a pixel 
+            # Passes above information into the pixel_wavelength_information, and it gets the (brilliance?) of a pixel
             to_put = pixel_wavelength_information(to_get)
             
-            # To find the maximum brightness pixel, the max is compared 
+            # To find the maximum brightness pixel, the max is compared
             maximum_pixel_brilliance = max(maximum_pixel_brilliance, to_put)
             
             # The numpy array at [number1][number2] becomes the value that was found in the variable to_put
             my_array[number1][number2] = to_put
-    
+
     # Normalizes the array using the normalize_pixels function
-    if selection == 1: 
+    if selection == 1:
         normalized_array = normalize_pixels(my_array, maximum_pixel_brilliance)
-        
+ 
         plt.imshow(normalized_array)
-    
+
         # img.show()
         plt.show()
     else: 
         plt.imshow(my_array)
         plt.show()
+
+def woaw_beautiful(pixel_x:int, pixel_y:int):
+    '''
     
+    Gets all the wavelengths for a pixel and graphs it out
+    
+    pixel_x = x location of pixel 
+    pixel_y = y location of pixel 
+    
+    Same as the pixel_graph function, except made in plotly, which gives more interactivitiy abilities and I can also graph the vertical lines
+    
+    Uses something called plotly to run, must be run in a interactive window (or jupyter)
+    
+    Import ipykernel and pip install --upgrade nbformat and hopefully it works
+    
+    
+    '''
+
+    # Gets the brilliance values for all the wavelengths of the pixel location provided
+    thing = pixel_information([pixel_x, pixel_y])
+
+    # Shape of the data 
+    data_shape = thing.shape
+
+    # Two lists that are appended to, creating the stuff that will be used to graph later
+    thing_1 = []
+    thing_2 = []
+
+    # Goes over every wavelength and adds its brillaince value to thing_2, the wavelength is added to thing_1
+    for thinint in range(data_shape[0]):
+        thing_1.append(thinint * metadata[1] + metadata[0])
+        thing_2.append(thing[thinint])
+
+    # Makes a panda table with the lists created above to be made into a list later 
+    df = pd.DataFrame({"Wavelength": thing_1, "Brilliance": thing_2})
+
+    # Graph created 
+    fig = px.line(df, x="Wavelength", y="Brilliance")
+
+    # Iterates over all the minimum wavelengths and puts them onto the graph 
+    for minimum_wavelength in spectral_monuments_min:
+
+        # Used to make sure the list is longer than 1, it is is, a rectangle is added
+        try:
+
+            # DO NOT DELETE THIS, this triggers an error if its only a single element (variable isn't used that butat's how its supposed to be) 
+            items = len(minimum_wavelength)
+       
+            # Rectangle added to the figure
+            fig.add_vrect(x0=minimum_wavelength[0], x1=minimum_wavelength[1], opacity=0.1, line_width=0, fillcolor="red")
+            
+        # If the length of minimum wavelength gives an error, it is not a list, so it only makes a line 
+        except TypeError:
+            
+            # Line added to the figure 
+            fig.add_vline(x=minimum_wavelength, line_width=0.5, line_dash="dash", line_color="red", opacity=0.75)
+            
+    for maximum_wavelength in spectral_monuments_max:
+
+        # Used to make sure the list is longer than 1, it is is, a rectangle is added
+        try:
+            
+            # DO NOT DELETE THIS, this triggers an error if its only a single element (variable isn't used that butat's how its supposed to be) 
+            items = len(maximum_wavelength)
+            
+            # Rectangle added to the figure
+            fig.add_vrect(x0=maximum_wavelength[0], x1=maximum_wavelength[1], opacity=0.1, line_width=0, fillcolor="blue")
+            
+        # If the length of minimum wavelength gives an error, it is not a list, so it only makes a line 
+        except TypeError:
+            
+            # Line added to the figure 
+            fig.add_vline(x=maximum_wavelength, line_width=0.75, line_dash="dash", line_color="blue", opacity=0.75)
+
+    # Figure is displayed 
+    fig.show()
+
+
 def pixel_graph(pixel_x:int, pixel_y:int): 
     # WORKS PROPERLY!!
     '''
@@ -149,21 +227,27 @@ def pixel_graph(pixel_x:int, pixel_y:int):
     pixel_x = x location of pixel 
     pixel_y = y location of pixel 
     '''
-    
+
+    # Gets the brilliance values for all the wavelengths of the pixel location provided
     thing = pixel_information([pixel_x, pixel_y])
 
-    data_shape = data.shape
+    # Gets the shape of the thing
+    data_shape = thing.shape
     
+    # Lists to be graphed 
     thing_1 = []
     thing_2 = []
-    
-    for thinint in range(data_shape[2]):
-        thing_1.append(thinint)
+
+    # Graphs the wavelength in thing_1 and brilliance in thing_2
+    for thinint in range(data_shape[0]):
+        thing_1.append(thinint * metadata[1] + metadata[0])
         thing_2.append(thing[thinint])
-        
+
+    # Makes the stuff into a numpy to be graphed
     thing_1 = np.array(thing_1)
     thing_2 = np.array(thing_2)
     
+    # Graphs the stuff 
     plt.title("Pixel Graph")
     plt.xlabel("Wavelength Band")
     plt.ylabel("Brilliance")
@@ -259,6 +343,7 @@ def caller():
         elif command == "Help":
             halp()
 
-# create_band_sheet(3, 2)
-
-pixel_graph(100, 100)
+create_band_sheet(3, 2)
+cook_a_line(5, 70)
+pixel_graph(30, 30)
+woaw_beautiful(100, 100)
