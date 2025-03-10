@@ -1,7 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt 
 import plotly.express as px
+import plotly.graph_objects
 import pandas as pd
+import os
 
 # a seperate file named data_from which stores location of whatever dataset you want analyzed
 from data_from import indian_pine, indian_pine_wavelength_separation, spectral_monuments_min, spectral_monuments_max
@@ -14,7 +16,7 @@ data = np.load(indian_pine)
 # ---------- Aux Functions (These functions pobs won't be called, but they're used for the other functions) ---------- #
 file_path = indian_pine
 
-def normalize_pixels(array_to_normalize: np.array, maximum_pixel: int):
+def normalize_pixels(array_to_normalize: np.array, maximum_pixel: int, new_max:int):
     '''
     I have to normalize the pixels because its in watts per square meter per steradian (whut) 
     
@@ -32,7 +34,7 @@ def normalize_pixels(array_to_normalize: np.array, maximum_pixel: int):
     # normalizes the data 
     for number1 in range(0, data_shape[0]):
         for number2 in range(0, data_shape[1]):
-            to_put = (array_to_normalize[number1][number2] / maximum_pixel) * 255
+            to_put = (array_to_normalize[number1][number2] / maximum_pixel) * new_max
 
             normalized_array[number1][number2] = to_put
 
@@ -58,6 +60,45 @@ def pixel_information(result=[int, int]):
     
     # result[0] is the x component and result[1] is the y component
     return (data[result[0]][result[1]])
+
+def create_a_panda(wavelength: int): 
+    '''
+    Creates up a panda
+    '''
+
+    # Sets the thing to infinity so none of that "..." truncating funny business happens
+    np.set_printoptions(threshold=np.inf)
+    
+    # Gets the shape of the data, only ever tried this on the indian pines dataset but hopefully it'll work for anything 
+    data_shape = data.shape
+
+    # Makes an array with data_shape[0] * data_shape[1] pixels to put numbers into 
+    my_array = np.zeros((data_shape[0], data_shape[1]))
+    
+    # This gets the highest watt per square meter per steradian for the normalization function
+    maximum_pixel_brilliance = 0
+    
+    # iterates through the elements in the array and puts it into my_array, units are in watts per square unit per steradian
+    for number1 in range(0, data_shape[0]):
+        for number2 in range(0, data_shape[1]):
+                      
+            # Specifies the pixel you want the information for, and the band you want it from
+            to_get = [number1, number2, wavelength]
+            
+            # Passes above information into the pixel_wavelength_information, and it gets the (brilliance?) of a pixel
+            to_put = pixel_wavelength_information(to_get)
+            
+            # To find the maximum brightness pixel, the max is compared
+            maximum_pixel_brilliance = max(maximum_pixel_brilliance, to_put)
+            
+            # The numpy array at [number1][number2] becomes the value that was found in the variable to_put
+            my_array[number1][number2] = to_put
+
+    df = pd.DataFrame(my_array)
+
+    print(df)
+    
+    df.to_csv(f"{wavelength}_panda.csv", index=False)
 
 # ----- Real Functions (this is the stuff that'll get used I think) ----- #
 
@@ -88,7 +129,7 @@ def cook_a_line(wavelength:int, height: int):
     plt.plot(numbers, to_graph_array)
     plt.show()
 
-def create_band_sheet(wavelength: int, selection: int):
+def create_band_sheet(wavelength: int, selection: int, selection_number:int = 255):
     # WORKS PROPERLY!!
     '''
     Creates a big fat 145 * 145 numpy array of all the pixels at a certain band/wavelength, then creates an image using Pillow 
@@ -132,7 +173,7 @@ def create_band_sheet(wavelength: int, selection: int):
 
     # Normalizes the array using the normalize_pixels function
     if selection == 1:
-        normalized_array = normalize_pixels(my_array, maximum_pixel_brilliance)
+        normalized_array = normalize_pixels(my_array, maximum_pixel_brilliance, selection_number)
  
         plt.imshow(normalized_array)
 
@@ -142,7 +183,7 @@ def create_band_sheet(wavelength: int, selection: int):
         plt.imshow(my_array)
         plt.show()
 
-def woaw_beautiful(pixel_x:int, pixel_y:int):
+def interactive_3d_pixel_line_display(pixel_x:int, pixel_y:int):
     '''
     
     Gets all the wavelengths for a pixel and graphs it out
@@ -218,6 +259,36 @@ def woaw_beautiful(pixel_x:int, pixel_y:int):
     # Figure is displayed 
     fig.show()
 
+def interactive_3d_graph_display(wavelength: int):
+    '''
+    What does this function do o-O 
+
+    Hmm, I wonder why it only takes in wavelength and nothing else, what magic does it perform :O 
+    '''
+
+    supposed_path = f"{wavelength}_panda.csv"
+
+    if os.path.exists(supposed_path):
+        pass
+    else: 
+        create_a_panda(wavelength)
+
+    z_data = pd.read_csv(supposed_path)
+    z = z_data.values 
+
+    wavelength = 10 * wavelength + 400
+
+    sh_0, sh_1 = z.shape
+    x, y = np.linspace(0, 1, sh_0), np.linspace(0, 1, sh_1)
+    fig = plotly.graph_objects.Figure(data=[plotly.graph_objects.Surface(z=z, x=x, y=y)])
+
+    fig.update_traces(contours_z=dict(show=True, usecolormap=True,
+                                  highlightcolor="limegreen", project_z=True))
+
+    fig.update_layout(title=dict(text=f'Wavelength {wavelength}'), autosize=False,
+                    width=800, height=800,
+                    margin=dict(l=65, r=50, b=65, t=90))
+    fig.show()
 
 def pixel_graph(pixel_x:int, pixel_y:int): 
     # WORKS PROPERLY!!
@@ -253,7 +324,83 @@ def pixel_graph(pixel_x:int, pixel_y:int):
     plt.ylabel("Brilliance")
     plt.plot(thing_1, thing_2)
     plt.show()   
+
+# ----- Relating to Smile ----- #
     
+def cheese(maxed:int, wavelength: int, height: int):
+    '''
+    Crazy unoptimized. Look at cook_a_line and implement it one day so I don't copy everything over
+    '''
+    data_shape = data.shape
+
+    print(data_shape)
+
+    to_graph_array = []
+    numbers = []
+    
+    for pixel_number in range(data_shape[1]):
+        first = pixel_information([height, pixel_number])
+        pixel_informations = pixel_wavelength_information([height, pixel_number, wavelength])
+        
+        to_graph_array.append(pixel_informations)
+        numbers.append(pixel_number)
+        
+    plt.title("Band Graph")
+    plt.xlabel("Location")
+    plt.ylabel("Brilliance")
+    plt.plot(numbers, to_graph_array, zorder=1)
+
+    print(numbers)
+    for number in range(len(numbers)): 
+        numbers[number] = numbers[number]+(-maxed)/((data_shape[1]/2) ** 2) * number * (number - data_shape[1])
+    print(numbers)
+    plt.plot(numbers, to_graph_array, zorder=2)
+    plt.show()
+
+    g_1 = []
+    for _ in range(145):
+        g_1.append(_)
+
+    g_2 = numbers
+
+    print(g_1)
+    for number in range(len(g_2)): 
+        g_2[number] = (-maxed)/((data_shape[1]/2) ** 2) * number * (number - data_shape[1])
+    print(g_2)
+
+    plt.plot(g_1, g_2)
+    plt.show()
+
+    
+
+
+def cook_a_line(wavelength:int, height: int):
+    '''
+    Gets you a graph for a line at a certain height at a certain wavelength. 
+    
+    wavelength: Represents the wavelength band you are selecting
+    height: I think its from the top down???? so maybe it should be depth??? idk ill figure it out in the future
+    '''
+    
+    # Gets the size of the data that will be created so we can iterate all the data
+    data_shape = data.shape
+    
+    to_graph_array = []
+    numbers = []
+    
+    for pixel_number in range(data_shape[1]):
+        first = pixel_information([height, pixel_number])
+        pixel_informations = pixel_wavelength_information([height, pixel_number, wavelength])
+        
+        to_graph_array.append(pixel_informations)
+        numbers.append(pixel_number)
+        
+    plt.title("Band Graph")
+    plt.xlabel("Location")
+    plt.ylabel("Brilliance")
+    plt.plot(numbers, to_graph_array)
+    plt.show()
+
 # If none is specified as the input for this function, this function will ask you what function you want to call later on, if it is specified, it'll call it automatically
 # this is better for automation
 def calling_function(to_call=None, list_of_numbers = [None, None, None]):
@@ -275,7 +422,7 @@ def calling_function(to_call=None, list_of_numbers = [None, None, None]):
     # These numbers can be considered the "bands" of the data, where band 1 (first element in the list) corresponds to the first wavelength
     wavelength_list = [
         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 
-        11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 
+        11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
         21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
         31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 
         41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 
@@ -346,4 +493,8 @@ def caller():
 create_band_sheet(3, 2)
 cook_a_line(5, 70)
 pixel_graph(30, 30)
-woaw_beautiful(100, 100)
+interactive_3d_pixel_line_display(100, 100)
+
+interactive_3d_graph_display(3)
+
+cheese(1, 2, 70)
