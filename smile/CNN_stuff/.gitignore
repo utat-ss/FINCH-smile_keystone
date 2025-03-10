@@ -2,3 +2,5 @@
 /Convolutional Neural Network.py
 /seaborn.py
 /trial.py
+adversarial_network.py
+gan_secrets.py
