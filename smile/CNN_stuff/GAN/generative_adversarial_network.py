@@ -7,11 +7,12 @@ import matplotlib.pyplot as plt
 from torch.utils.data import Dataset, DataLoader
 import time
 from datetime import datetime
+from gan_secrets import csv_file
 
 # ----------------------- DEFINING PARAMETERS ----------------------- #
 
 # Load the data
-data = pd.read_csv('simpler_data.csv')
+data = pd.read_csv(csv_file)
 
 # Defining the device to be used, this will use the GPU if available
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

@@ -13,7 +13,7 @@ metadata = indian_pine_wavelength_separation
 # The data that is being analyzed (.npy file), and the file that the data will be written into 
 data = np.load(indian_pine)
 
-# ---------- Aux Functions (These functions pobs won't be called, but they're used for the other functions) ---------- #
+# ---------- Aux Functions (These functions probs won't be called, but they're used for the other functions) ---------- #
 file_path = indian_pine
 
 def normalize_pixels(array_to_normalize: np.array, maximum_pixel: int, new_max:int):
@@ -325,55 +325,6 @@ def pixel_graph(pixel_x:int, pixel_y:int):
     plt.plot(thing_1, thing_2)
     plt.show()   
 
-# ----- Relating to Smile ----- #
-    
-def cheese(maxed:int, wavelength: int, height: int):
-    '''
-    Crazy unoptimized. Look at cook_a_line and implement it one day so I don't copy everything over
-    '''
-    data_shape = data.shape
-
-    print(data_shape)
-
-    to_graph_array = []
-    numbers = []
-    
-    for pixel_number in range(data_shape[1]):
-        first = pixel_information([height, pixel_number])
-        pixel_informations = pixel_wavelength_information([height, pixel_number, wavelength])
-        
-        to_graph_array.append(pixel_informations)
-        numbers.append(pixel_number)
-        
-    plt.title("Band Graph")
-    plt.xlabel("Location")
-    plt.ylabel("Brilliance")
-    plt.plot(numbers, to_graph_array, zorder=1)
-
-    print(numbers)
-    for number in range(len(numbers)): 
-        numbers[number] = numbers[number]+(-maxed)/((data_shape[1]/2) ** 2) * number * (number - data_shape[1])
-    print(numbers)
-    plt.plot(numbers, to_graph_array, zorder=2)
-    plt.show()
-
-    g_1 = []
-    for _ in range(145):
-        g_1.append(_)
-
-    g_2 = numbers
-
-    print(g_1)
-    for number in range(len(g_2)): 
-        g_2[number] = (-maxed)/((data_shape[1]/2) ** 2) * number * (number - data_shape[1])
-    print(g_2)
-
-    plt.plot(g_1, g_2)
-    plt.show()
-
-    
-
-
 def cook_a_line(wavelength:int, height: int):
     '''
     Gets you a graph for a line at a certain height at a certain wavelength. 
@@ -401,94 +352,204 @@ def cook_a_line(wavelength:int, height: int):
     plt.plot(numbers, to_graph_array)
     plt.show()
 
-# If none is specified as the input for this function, this function will ask you what function you want to call later on, if it is specified, it'll call it automatically
-# this is better for automation
-def calling_function(to_call=None, list_of_numbers = [None, None, None]):
+# ---------- START OF CHEESE FUNCTIONS ---------- #
+
+def cheese1(maxed: int, wavelength: int, height: int):
     '''
-    This function currently doesn't do anything 
+    Parabolic Shift. Applies a parabolic smile shift to spectral data.
     
-    This function calls other functions, such as pixel_information and pixel_wavelength_information (above)
-    
-    The "to_call"
+    Args:
+        maxed (int): Maximum shift amount at the edges
+        wavelength (int): The wavelength band to visualize
+        height (int): The row position in the image to analyze
     '''
-    print("Something happened!")
+    data_shape = data.shape
     
-    # The "indian_pine_array.npy" file has the dimensions (145, 145, 200), so its a 145 by 145 image (145 squared pixels) with 200 wavelenghths per pixel
+    # Extract the original data
+    my_data = []
+    numbers = []
     
-    # Makes it so python doesn't truncate it and make those "..." when there's more data let's you see all the data basically
-    np.set_printoptions(threshold=np.inf)
+    for pixel_number in range(data_shape[1]):
+        pixel_informations = pixel_wavelength_information([height, pixel_number, wavelength])
+        my_data.append(pixel_informations)
+        numbers.append(pixel_number)
     
-    # This list contains all the actual wavelengths, the numbers here will just be placeholders for until I actually get the wavelengths provided
-    # These numbers can be considered the "bands" of the data, where band 1 (first element in the list) corresponds to the first wavelength
-    wavelength_list = [
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 
-        11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-        21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
-        31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 
-        41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 
-        51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 
-        61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 
-        71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 
-        81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 
-        91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 
-        101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 
-        111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 
-        121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 
-        131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 
-        141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 
-        151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 
-        161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 
-        171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 
-        181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 
-        191, 192, 193, 194, 195, 196, 197, 198, 199, 200
-    ]
+    # Calculate the shift amount for each position
+    shift_data = []
+    for number in numbers:
+        # Parabolic function that creates a smile/frown effect
+        shift = (-maxed)/((data_shape[1]/2) ** 2) * number * (number - data_shape[1])
+        shift_data.append(shift)
     
-    # Tells you the dimensions of the image
-    # print(data.shape)
+    # Apply the shift to create modified positions
+    modified_numbers = []
+    for i, number in enumerate(numbers):
+        modified_numbers.append(number + shift_data[i])
     
-    # Provides all the wavelength data for the first pixel in the first column 
-    # print(data[0][0])
-    
-    numba = True
-    
-    # Writes every row into the text file you provided in "file_path"
-    with open(file_path, 'w') as file:
-        for row in data: 
-            if numba: 
-                # print(row[0][0])
-                numba = False
-            row = str(row)
-            file.write(str(row))
-            
-# Prints out all the functions that are callable from calling_function, as well as their docstrings and what they need
-def halp(): 
-    print("\n")
-    
-    # A dictionary of all the functions, and references the function it is meant to represent
-    my_functions = {
-        "pixel_information": pixel_information, 
-        "pixel_wavelength_information": pixel_wavelength_information,
-        "create_band_sheet": create_band_sheet, 
-    }
-    
-    for defined_function in my_functions.keys(): 
-        print(defined_function + ": " + my_functions[defined_function].__doc__)
+    # Graph the results
+    grapher(numbers, my_data, modified_numbers, shift_data, 1)
 
-def make(): 
-    pass     
 
-# tbh I don't think I'm ever gonna finish the below function not much point in making it easy to use if you can just type the function name in
-def caller(): 
-    # This function calls the other functions
-    continue_calling = True
+def cheese2(amplitude: int, wavelength: int, height: int, mean: float = None, std_dev: float = None, shift_direction: int = 1):
+    '''
+    An improved version of the cheese function that uses a normal distribution.
+    
+    Parameters:
+    -----------
+    amplitude: int
+        The maximum height of the normal distribution curve. This part is the maximum shift, and it appears at the mean (This is the height of the tallest part of the normal distibution (the part that is shifted the most is shifted by this amount))
+    wavelength: int
+        The wavelength band you are selecting. It is based on this, you get the row of wavelengths, that is then shifted over 
+    height: int
+        The height position in the image. After you have selected the wavelegnth of the image, you also get to choose how high up on the image you want to gerneate smile shift for. (70 would be the 70th pixel from the bottom, either that, or the70th pixel from the top)
+    mean: float, optional
+        The mean of the normal distribution. If None, defaults to the center of the data. Where is the largest distibution located?
+    std_dev: float, optional
+        The standard deviation of the normal distribution. How quickly does the normol distibution drop off
+    shift_direction: int, optional 
+        Defines whether to implement smile shift forward or backwards, 1 implements it forward, -1 implements it backwards, I'll come up with a purpose for 0 one day
+    '''
+    data_shape = data.shape
+    
+    # Extract the original data
+    to_graph_array = []
+    numbers = []
+    
+    for pixel_number in range(data_shape[1]):
+        pixel_informations = pixel_wavelength_information([height, pixel_number, wavelength])
+        to_graph_array.append(pixel_informations)
+        numbers.append(pixel_number)
+    
+    # Set default values for mean and std_dev if not provided
+    if mean is None:
+        mean = data_shape[1] / 2  # Center of the data
+    
+    if std_dev is None:
+        std_dev = data_shape[1] / 6  # 1/6 of the data width
+    
+    # Calculate normal distribution values
+    normal_dist = []
+    for x in numbers:
+        # Normal distribution formula: f(x) = amplitude * exp(-(x-mean)²/(2*std_dev²))
+        normal_value = amplitude * np.exp(-((x - mean) ** 2) / (2 * std_dev ** 2))
+        normal_dist.append(normal_value)
+    
+    # Create modified data with normal distribution
+    modified_numbers = []
+    for i, x in enumerate(numbers):
+        if shift_direction == 1:
+            modified_numbers.append(x - normal_dist[i])
+        elif shift_direction == -1:
+            modified_numbers.append(x + normal_dist[i])
+    
+    grapher(numbers, to_graph_array, modified_numbers, normal_dist, 2)
 
-    while continue_calling: 
-        command = input('What function do you want? "Stop" for Stopping (unexpected!) and "Help" for a list of commands')
-        if command == "Stop": 
-            continue_calling = False
-            continue
-        elif command == "Help":
-            halp()
+def cheese3(amplitude: int, wavelength: int, height: int, mean: float = None, std_dev_left: float = None, std_dev_right: float = None, shift_direction: int = 1):
+    '''
+    An improved version of the cheese function that uses a normal distribution.
+    
+    Parameters:
+    -----------
+    data: np.ndarray
+        The input image or data array from which we extract pixel information.
+    amplitude: int
+        The maximum height of the normal distribution curve. Determines the maximum shift.
+    wavelength: int
+        The wavelength band to be processed.
+    height: int
+        The vertical position in the image where the shift is applied.
+    mean: float, optional
+        The mean of the normal distribution. Defaults to the center of the image width.
+    std_dev_left: float, optional
+        Standard deviation for the left side of the distribution.
+    std_dev_right: float, optional
+        Standard deviation for the right side of the distribution.
+    shift_direction: int, optional 
+        Direction of the shift: 1 for forward, -1 for backward.
+    '''
+
+    data_shape = data.shape
+
+    # Extract the original data
+    to_graph_array = []
+    numbers = []
+    
+    for pixel_number in range(data_shape[1]):
+        pixel_informations = pixel_wavelength_information([height, pixel_number, wavelength])
+        to_graph_array.append(pixel_informations)
+        numbers.append(pixel_number)
+
+    # Set default values for mean and std_dev if not provided
+    if mean is None:
+        mean = data_shape[1] / 2  # Center of the data
+    
+    if std_dev_right is None:
+        std_dev_right = data_shape[1] / 6  # Default: 1/6 of the data width
+
+    if std_dev_left is None:
+        std_dev_left = data_shape[1] / 6  # Default: 1/6 of the data width
+
+    # Calculate normal distribution values
+    normal_dist = []
+    for x in numbers:
+        if x < mean:
+            normal_value = amplitude * np.exp(-((x - mean) ** 2) / (2 * std_dev_left ** 2))
+        else: 
+            normal_value = amplitude * np.exp(-((x - mean) ** 2) / (2 * std_dev_right ** 2))
+        normal_dist.append(normal_value)
+
+    # Create modified data with normal distribution
+    modified_numbers = []
+    for i, x in enumerate(numbers):
+        if shift_direction == 1:
+            modified_numbers.append(x - normal_dist[i])
+        elif shift_direction == -1:
+            modified_numbers.append(x + normal_dist[i])
+        else:
+            modified_numbers.append(x) 
+
+    grapher(numbers, to_graph_array, modified_numbers, normal_dist, 3)
+
+
+def grapher(numbers: list, my_data, modified_numbers, shift_data, version):
+    """
+    This function was created to reduce the amount of code that was used in graphing the cheese functions. By putting it into one function, I won't have to figure out how to graph things again for every version of smile shift generator I create. 
+    
+    This code only kind of works for SMILE Version 1, and I don't think I'll have to use that one, so I'm not gonna spend a bunch of time trying to figure that part out!
+    Args:
+        numbers (list): This is the original numbers that are passed into the function. By default, this is just counting up by 1
+        my_data (list): Takes in a list of the spectral data, this is the same for both the modified and unmodified data, as smile shift does not occur in in the y axis (no reduction or increase in brilliance)
+        modified_numbers (list): Same as numbers, but after smile shift has been applied
+        shift_data (list): This is the graph of the amount of shift applied
+        version (int): The version of smile shift that was used, allows you to pinpoint the function that generated the shift
+    """
+    '''
+    There are way too many graphing functions for the cheese stuff, and I have to figure out which function it is, which is quite a pain. This function will be used as the one that graphs all the cheese information. 
+
+    Takes in two lists, the original data, and the modified data, and graphs them. This makes it so I don't have to rewrite the plotting function every time (wastes a lot of code)
+    
+    The curve that is used to modify the data will be plotted under everything else. (might make a separate function for this, for only the affected, but we'll figure that out in the future)
+    '''
+    # Plot just the normal distribution curve
+    plt.figure(figsize=(10, 6))
+    plt.title(f"Spectra Graph: SMILE Version {version}")
+    plt.xlabel("Location")
+    plt.ylabel("Brilliance")
+    plt.plot(modified_numbers, my_data, zorder=3, color="red", label="Modified Data")
+    plt.plot(numbers, my_data, zorder=2, color="blue", label="Original Data")
+    plt.legend(loc="upper left")
+    plt.grid(True)
+    plt.show()
+
+    plt.figure(figsize=(10, 6))
+    plt.title(f"Change Curve: SMILE Version {version}")
+    plt.xlabel("Location")
+    plt.ylabel("Location Shift")
+    plt.plot(numbers, shift_data)
+    plt.grid(True)
+    plt.show()
+
+# ---------- END OF CHEESE FUNCTIONS ---------- #
 
 create_band_sheet(3, 2)
 cook_a_line(5, 70)
@@ -497,4 +558,6 @@ interactive_3d_pixel_line_display(100, 100)
 
 interactive_3d_graph_display(3)
 
-cheese(1, 2, 70)
+# Figure out if the shifted amoutn is always forward or always backwards. Nobody has an idea! We ball!
+cheese2(amplitude=2, wavelength=100, height=70, mean=100, std_dev=60, shift_direction=1)
+cheese3(amplitude=3, wavelength=100, height=70, mean=100, std_dev_left=60, std_dev_right=30, shift_direction=1)
