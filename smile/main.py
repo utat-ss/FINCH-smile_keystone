@@ -120,8 +120,9 @@ if __name__ == '__main__':
     # # # Quantification
     # Step 0: Generate artificial SMILE shift in the radianceData
     step_start = timeit.default_timer()
-    data = generate_smile_shift(data)
+    data = generate_smile_shift(data, wavelength_input, generate_shift_val)
     print ("Step 0 Done, no issues.")
+    np.savez_compressed(f'{data_folder_path}smiled_data', smiled_data = data)
     step_end = timeit.default_timer()
     log_message(f"Step 0: Generate artificial SMILE shift - {step_end - step_start:.4f} seconds")
 

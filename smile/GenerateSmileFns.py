@@ -13,6 +13,7 @@ def generate_shift_val(column_length, row_length, maxShift=None):
 
     Args:
         column_length (int) : The length of the column
+        row_length (int) : The length of the row
         maxShift (int, optional): The maximum shift value. Defaults to 0.05 x row_length.
 
     Returns:
@@ -32,7 +33,7 @@ def generate_smile_shift(data, wavelength, generateShiftFunction, maxShift = Non
     It then uses CubicSpline interpolation to generate the shifted data.
 
     Args:
-        data (numpy array): The radianceData with dimension row x column x spectral
+        data (numpy array): The radianceData with dimension spectral x row x column
         wavelength (numpy array) : The wavelength (spectral band) for the data. Used for interpolation
         generateShiftFunction (function): A function to generate the shift for each column
         maxShift: The maximum of shift on the peak (Center of data for quadratic function)
@@ -42,15 +43,15 @@ def generate_smile_shift(data, wavelength, generateShiftFunction, maxShift = Non
     if (data.dtype == np.uint16):
         data = data.astype(np.float32) # To avoid overflow while doing interpolation
     
+    num_rows = np.shape(data)[1]
+    num_cols = np.shape(data)[2]
 
-    num_cols = np.shape(data)[1]
-    num_rows = np.shape(data)[0]
     shiftValue = generateShiftFunction(num_cols, num_rows, maxShift) # How the shift is generated (Simplest one is quadratic function)
     shiftedData = np.zeros_like(data)
 
     for col in range(num_cols):
         for row in range(num_rows):
-            cs = CubicSpline(wavelength, data[row][col])
-            shiftedData[row][col] = cs(wavelength + shiftValue[col])
+            cs = CubicSpline(wavelength, data[:, row, col])
+            shiftedData[:, row, col] = cs(wavelength + shiftValue[col])
 
     return shiftedData
