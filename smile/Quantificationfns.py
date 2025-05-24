@@ -12,43 +12,43 @@ import config
 #   with values equal to the averages of the columns of dimension a. In other words, replaces dimension a with
 #   the mean of its values, collapsing the 3-D matrix into a 2-D one.
 def data_matrix_collapse(image_file):
-    ''' 
-    Takes a 3-dimensional array of size a*b*c, and returns a 2-dimensional array of size b*c
-    with values equal to the averages of the columns of dimension a. In other words, replaces
-    dimension a with the mean of its values, collapsing the 3-D matrix into a 2-D one. 
+    """
+    Takes a 3-dimensional array of shape (bands, rows, cols) and returns a 2-dimensional array
+    of shape (bands, cols) by averaging over the rows dimensions. In other words, for each
+    spectral band and column, it computes the mean across all rows, producing a spectrum for
+    every column that is averaged vertically.
 
-    Args: 
-      3-D array of size a*b*c
-    Returns: 
-      2-D array of size a*c (Or size c*a if transposed)
-    '''
-    AdimSpectral = len(image_file) # spectral
-    AdimLength = len(image_file[0]) # row
-    AdimWidth = len(image_file[0][0]) # column
+    Args:
+        3-D array of shape (bands, rows, cols)
+    Returns:
+        2-D  array of shape (bands, cols) (or (cols, bands) if transposed)
+    """
+    # Get dimensions from the input image 
+    AdimSpectral = len(image_file)    # Number of bands
+    AdimLength = len(image_file[0])   # Number of rows
+    AdimWidth = len(image_file[0][0]) # Number of columns
 
-    # These are not expected values, but I used them to verify the output dimensions.
-
-    # Read the input image and create a copy aimg with the same dimensions.
+    # Read the input image and create a copy aimg with the same dimensions
     Aimg = image_file
 
-    # Create a new empty matrix k, which has one dimension less than aimg (Instead of being spectral x row x            col, it is spectral x row only)
+    # Create an empty array to hold column-averaged spectra
+    # Shape: (bands, cols)
     k = np.zeros((AdimSpectral, AdimWidth))
-    
 
-    # For each "slice"  of aimg, set b to be equal to a 2D version of that slice (isolating that slice).
-    for slice in range(AdimSpectral):
-        b = np.reshape(Aimg[slice, :, :], (AdimLength, AdimWidth))
-        # In b, take the average of all spectral values in the spectral dimension
+    # For each spectral band (slice), extract the 2D spatial image
+    for band in range(AdimSpectral):
+        b = np.reshape(Aimg[band, :, :], (AdimLength, AdimWidth))
+        
+        # Average over rows to get column-averaged values for this band
         collapsed_b = np.zeros(AdimWidth)
-        for smallerslice in range(AdimWidth):
-            collapsed_b[smallerslice] = np.mean(b[smallerslice, :])
-        k[slice, :] = collapsed_b
+        for col_index in range(AdimWidth):
+            collapsed_b[col_index] = np.mean(b[:, col_index])
 
-    # Then, set the corresponding cell row in k to be equal to b.
-    # Repeat the previous three steps for each of the initial slices.
-    # In essence, k takes the averages of the each wavelength per row and "collapses" them into size slices of column averaged spectra.
-    # Finally, tranpose k to get L, size 5x10.
-    k_transpose = np.transpose(k) # k_transpose is unused but may be useful
+        k[band, :] = collapsed_b
+
+    # Tranpose to obtain shape (cols, bands)
+    k_transpose = np.transpose(k)
+
     return k_transpose
 
 # Author: Shuhan
