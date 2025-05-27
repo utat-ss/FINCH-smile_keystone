@@ -95,10 +95,11 @@ log_message(f"Import Step: Load and crop Indian Pine data - {step_end - step_sta
 
 # # Load MODTRAN data
 step_start = timeit.default_timer()
-MODTRAN_x, MODTRAN_data= extract_from_MODTRAN(Reference_data_filepath)
-Reference_wl = MODTRAN_data
+MODTRAN_x, MODTRAN_data = extract_from_MODTRAN(Reference_data_filepath)
+Reference_wl = MODTRAN_x
 Reference_data = MODTRAN_data
 if feature is not None:
+    feature_start, feature_end = get_feature_index(Reference_wl, feature)
     Reference_wl = Reference_wl[feature_start:feature_end]
     Reference_data = Reference_data[feature_start:feature_end]
 np.savez_compressed(f'{data_folder_path}cropped_MODTRAN_data', MODTRAN_wl=Reference_wl, MODTRAN_data=Reference_data)
