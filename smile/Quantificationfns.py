@@ -53,7 +53,7 @@ def data_matrix_collapse(image_file):
 
 # Author: Shuhan
 # This fn contains mathematical functions that are currently placeholders for the sensor's spectral response functions. 
-def test_spectral_response(x, mu = None):
+def test_spectral_response(x, mu = None, delta = None):
     """
     A test spectral response function. Basically a Gaussian function centered 
         at mu * (max(x) - min(x)) with std = sigma
@@ -64,16 +64,26 @@ def test_spectral_response(x, mu = None):
     Output: 
         A Gaussian function corresponding to the inxpxut. A 1D array
     """
-    # sigma = x[int(0.25 * len(x))]
-    # mu = x[int(0.5 * len(x))]
-    sigma = x[int(0.01 * len(x))]
-
     if mu is None:
         mu = x[int(0.5 * len(x))]
 
-    gaussian = stats.norm.pdf(x, mu, sigma)
-    normed_gaussian = gaussian / sum(gaussian)
+    if delta is None:
+        delta = (x.max() - x.min()) / 10
+
+    sigma = delta / (2 * np.sqrt(2 * np.log(2)))
+
+    # Add a buffer on both sides of x in case the gaussian is at the edge
+    buffer_width = 3 * sigma
+    left_buffer = np.linspace(x.min() - buffer_width, x.min(), 50, endpoint=False)
+    right_buffer = np.linspace(x.max(), x.max() + buffer_width, 50, endpoint=False)
+    x_extended = np.concatenate([left_buffer, x, right_buffer])
+
+    gaussian = stats.norm.pdf(x_extended, mu, sigma)
+    normed_gaussian = gaussian / gaussian.max()
     
+    indices = np.searchsorted(x_extended, x)
+    normed_gaussian = normed_gaussian[indices]
+
     return normed_gaussian
 
 # Author: Shuhan

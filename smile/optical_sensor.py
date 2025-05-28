@@ -29,36 +29,27 @@ class optical_sensor:
         self.spectral_response_function = spectral_response_function1
 
         # Compute the band center, band width, and band wavelength
-        # self.left_index = config.band_index[band_number]
-        # self.right_index = config.band_index[band_number+1]
-        # self.band_wavelength = config.wavelength_input[self.left_index:self.right_index]
         max_wl = config.wavelength_input[-1]
         min_wl = config.wavelength_input[0]
         self.band_wavelength = np.linspace(min_wl, max_wl, len(data_input))
-        # band_width = self.band_wavelength[-1] - self.band_wavelength[0]
-        band_width = len(data_input)
-        self.band_center = (band_width)/2
+        self.band_width = self.band_wavelength[-1] - self.band_wavelength[0]
+        self.band_center = config.wavelength_input[band_number]
 
         # Compute the resampled spectra
-        self.intensity = data_input # [self.left_index:self.right_index]
+        self.intensity = data_input
 
         # Compute the statistical weights to assign via the spectral response function
-        self.xpos = self.band_wavelength - self.band_center
+        self.xpos = self.band_wavelength
         self.shift_constant = shift_constant
-        self.spectral_response = self.spectral_response_function(self.xpos + self.shift_constant, self.band_center)
-
-        # print(np.shape(self.intensity), np.shape(self.band_wavelength))
-        # print(self.intensity, self.band_wavelength)
+        self.spectral_response = self.spectral_response_function(self.xpos, mu=self.band_center + self.shift_constant, delta=config.wavelength_increment)
 
         try:
             self.output = np.dot(self.intensity, self.spectral_response)
         except ValueError:
             print(self.intensity, self.spectral_response, self.xpos, self.band_wavelength)
 
-        # Generate a concatenated spectral response curve
-        self.sr_demo = self.spectral_response_function(np.linspace(min(self.xpos),
-                                                                   max(self.xpos),
-                                                                   100) + self.shift_constant)
+        # Generate a high-resolution version of the spectral response function for this band + shift
+        self.sr_demo = self.spectral_response_function(np.linspace(min(self.xpos), max(self.xpos), 1000), mu=self.band_center + self.shift_constant, delta=config.wavelength_increment)
 
 def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int, wavelength,
                            show_progress = True, data_is_feature = False):
