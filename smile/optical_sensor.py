@@ -93,8 +93,8 @@ def run_resampling_spectra(data_input, srf_input:list, shift_range:tuple or int,
 
     if isinstance(shift_range, tuple):
         # min_shift, max_shift = shift_range/wavelength_increment
-        min_shift = shift_range[0] / wavelength_increment
-        max_shift = shift_range[1] / wavelength_increment
+        min_shift = shift_range[0]
+        max_shift = shift_range[1]
         shift_range = np.linspace(min_shift, max_shift, config.g_num_shifts_1D*2+1)
         # shift_range = np.linspace(min_shift, max_shift, config.g_num_shifts_1D)
 

@@ -99,9 +99,9 @@ MODTRAN_x, MODTRAN_data = extract_from_MODTRAN(Reference_data_filepath)
 Reference_wl = MODTRAN_x
 Reference_data = MODTRAN_data
 if feature is not None:
-    feature_start, feature_end = get_feature_index(Reference_wl, feature)
-    Reference_wl = Reference_wl[feature_start:feature_end]
-    Reference_data = Reference_data[feature_start:feature_end]
+    Reference_feature_start, Reference_feature_end = get_feature_index(Reference_wl, feature)
+    Reference_wl = Reference_wl[Reference_feature_start:Reference_feature_end]
+    Reference_data = Reference_data[Reference_feature_start:Reference_feature_end]
 np.savez_compressed(f'{data_folder_path}cropped_MODTRAN_data', MODTRAN_wl=Reference_wl, MODTRAN_data=Reference_data)
 print("MODTRAN data loaded, no issues.")
 step_end = timeit.default_timer()
@@ -162,8 +162,8 @@ if __name__ == '__main__':
 
     # Step 6: Determine minimum spectral angle.
     step_start = timeit.default_timer()
-    min_spectral_angle = determine_min_sa_shift(sa_deg, g_data_dim)
-    print(min_spectral_angle, "at length = ", len(min_spectral_angle))
+    min_sa_wavelength_shifts, min_spectral_angle = determine_min_sa_shift(sa_deg, g_data_dim)
+    print(min_sa_wavelength_shifts, "at length = ", len(min_spectral_angle))
     print ("Step 6 Done, no issues.")
     np.savez_compressed(f'{data_folder_path}min_spectral_angle', msa = min_spectral_angle)
     print(f"Quantification complete, no issues. Data saved to {data_folder_path}")
@@ -181,7 +181,9 @@ if __name__ == '__main__':
     # Step 8: Generate smile corrected spectra for each pixel. (This turns out to be the most computationally expensive step.)
     step_start = timeit.default_timer()
     interpolated_wl = np.transpose(spectra_wav, ((1, 2, 0)))
-    corrected_datacube = smile_correction(spectra_rad, min_spectral_angle, test_spectral_response, interpolated_wl)
+    corrective_wavelength_shifts = min_sa_wavelength_shifts * -1
+    config.wavelength_input = wavelength
+    corrected_datacube = smile_correction(spectra_rad, corrective_wavelength_shifts, test_spectral_response, interpolated_wl)
     np.savez_compressed(f'{data_folder_path}corrected_datacube', corrected_data = corrected_datacube)
     print(f"Correction complete, no issues. Data saved to {data_folder_path}.")
     step_end = timeit.default_timer()

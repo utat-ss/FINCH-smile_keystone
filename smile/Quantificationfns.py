@@ -197,12 +197,18 @@ def determine_min_sa_shift(sa_deg, g_data_dim):
     """
     # Create a 1d array of size g_data_dim[2] conta`ining the smallest value in each row of sa_deg (the spectral angle in degrees)
     # Create another 1D array of size g_data_dim[2] containing the column number of the smallest value in each row
-    min_col_num = np.zeros(g_data_dim[2])
+    shift_bound = config.g_num_shifts_1D * config.g_shift_increment
+    shift_range = np.linspace(-shift_bound, shift_bound, config.g_num_shifts_1D * 2 + 1)
+
+    min_sa_value = np.zeros(g_data_dim[2])
+    best_wavelength_shifts = np.zeros(g_data_dim[2])
 
     for i in range(g_data_dim[2]):
         col = sa_deg[i]
         # finding the first occurance of the index of min_each_row[i]
         # min_col_num[i] = np.where(col == min_row)[0][0]
-        min_col_num[i] = np.argmin(col)
+        min_index = np.argmin(col)
+        min_sa_value[i] = col[min_index]
+        best_wavelength_shifts[i] = shift_range[min_index]
 
-    return min_col_num.astype(np.float16)
+    return best_wavelength_shifts, min_sa_value
