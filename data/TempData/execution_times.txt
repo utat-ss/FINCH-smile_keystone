@@ -1,0 +1,11 @@
+Execution log:
+Import Step: Load and crop Indian Pine data - 0.0001 seconds
+Import Step: Load and crop MODTRAN data - 0.0087 seconds
+Step 0: Generate artificial SMILE shift - 2.6224 seconds
+Step 1: Generate Column Averaged Spectra - 0.0827 seconds
+Step 2: Generate SRFs - 0.0001 seconds
+Step 3, 4: Generate Reference and Test spectra - 1.0699 seconds
+Step 5: Calculate spectral angle from test and reference spectra - 0.0109 seconds
+Step 6: Determine minimum spectral angle - 0.0019 seconds
+Step 7: Spline interpolation of test spectra - 3.2989 seconds
+Step 8: Generate smile corrected spectra for each pixel - 1568.0966 seconds
